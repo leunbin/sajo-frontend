@@ -1,0 +1,290 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.stocks-page {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 32px;
+
+    h1 {
+      margin: 0;
+      color: $color-navy-900;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 15px;
+    }
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: 1px solid $color-gray-200;
+    border-radius: $radius-md;
+    background: $color-white;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    svg {
+      flex-shrink: 0;
+      color: $color-gray-400;
+    }
+
+    &:focus-within {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+
+      svg {
+        color: $color-primary;
+      }
+    }
+
+    input {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: $color-gray-900;
+      font: inherit;
+      font-size: 15px;
+
+      &::placeholder {
+        color: $color-gray-400;
+      }
+
+      &::-webkit-search-cancel-button {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &__list-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-bottom: 14px;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    span {
+      color: $color-gray-500;
+      font-size: 14px;
+    }
+  }
+
+  &__list {
+    border-top: 1px solid $color-gray-200;
+  }
+
+  &__columns {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 140px 180px;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 20px;
+    border-bottom: 1px solid $color-gray-200;
+    color: $color-gray-500;
+    font-size: 13px;
+
+    span:last-child {
+      text-align: right;
+    }
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 140px 180px;
+    align-items: center;
+    width: 100%;
+    min-height: 72px;
+    padding: 0 20px;
+    border: 0;
+    border-bottom: 1px solid $color-gray-200;
+    background: transparent;
+    color: $color-gray-700;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+
+    &:hover {
+      background: $color-gray-50;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: -2px;
+    }
+
+    > span:last-child {
+      text-align: right;
+      color: $color-gray-900;
+      font-weight: 500;
+    }
+  }
+
+  &__stock {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    strong {
+      color: $color-gray-900;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    small {
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+  }
+
+  &__state {
+    padding: 72px 16px;
+    border-top: 1px solid $color-gray-200;
+    text-align: center;
+
+    p {
+      margin: 0;
+      color: $color-gray-700;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    span {
+      display: block;
+      margin-top: 6px;
+      color: $color-gray-500;
+      font-size: 14px;
+    }
+  }
+
+  &__loading {
+    padding: 24px 0;
+    color: $color-gray-500;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  &__observer {
+    width: 100%;
+    height: 1px;
+  }
+
+  &__stock-mobile-meta {
+    display: none;
+  }
+
+  &__market-cap {
+    color: $color-gray-700;
+    font-weight: 500;
+  }
+
+  @include mobile {
+    &__header {
+      margin-bottom: 24px;
+
+      h1 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    }
+
+    &__search {
+      height: 48px;
+      padding: 0 14px;
+    }
+
+    &__list-header {
+      margin-top: 32px;
+      padding-bottom: 12px;
+
+      h2 {
+        font-size: 17px;
+      }
+    }
+
+    &__columns {
+      display: none;
+    }
+
+    &__list {
+      border-top: 1px solid $color-gray-200;
+    }
+
+    &__row {
+      grid-template-columns: 1fr auto;
+      min-height: 78px;
+      padding: 14px 4px;
+
+      > span:last-child {
+        align-self: center;
+        padding-left: 16px;
+        font-size: 14px;
+      }
+    }
+
+    &__stock {
+      gap: 4px;
+
+      strong {
+        font-size: 15px;
+      }
+
+      small {
+        font-size: 12px;
+      }
+    }
+
+    &__state {
+      padding: 56px 12px;
+    }
+
+    &__stock-code {
+      display: none;
+    }
+
+    &__stock-mobile-meta {
+      display: block;
+      color: $color-gray-500;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    &__market {
+      display: none;
+    }
+
+    &__market-cap {
+      color: $color-gray-700;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+}
