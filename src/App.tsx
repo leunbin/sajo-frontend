@@ -11,6 +11,7 @@ import StrategiesPage from './pages/strategies/StrategiesPage';
 import StockDetailPage from './pages/stocks/StockDetailPage';
 import StrategyCreatePage from './pages/strategies/StrategyCreatePage';
 import StrategyDetailPage from './pages/strategies/StrategyDetailPage';
+import BacktestPage from './pages/strategies/BacktestPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/strategies/new" element={<StrategyCreatePage />} />
             <Route path="/strategies/:strategyId" element={<StrategyDetailPage />} />
             <Route path="/strategies" element={<StrategiesPage />} />
+            <Route path="/strategies/:strategyId/backtest" element={<BacktestPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/account" element={<AccountPage />} />
           </Route>

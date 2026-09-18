@@ -1,0 +1,451 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.backtest-page {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-gray-500;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      color: $color-gray-900;
+    }
+  }
+
+  &__header {
+    margin-top: 26px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid $color-gray-200;
+
+    h1 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+  }
+
+  &__form {
+    width: 100%;
+  }
+
+  &__section {
+    padding: 34px 0;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__section-header {
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: -0.2px;
+    }
+
+    p {
+      margin: 7px 0 0;
+      color: $color-gray-500;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  }
+
+  &__fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+
+    label {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 8px;
+
+      > span {
+        color: $color-gray-500;
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+
+    input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-sm;
+      outline: none;
+      background: $color-white;
+      color: $color-gray-900;
+      font: inherit;
+      font-size: 14px;
+
+      &:focus {
+        border-color: $color-primary;
+      }
+
+      &:disabled {
+        background: $color-gray-50;
+        color: $color-gray-500;
+        cursor: default;
+      }
+    }
+  }
+
+  &__money-input {
+    position: relative;
+
+    input {
+      padding-right: 38px;
+    }
+
+    > span {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      color: $color-gray-500;
+      font-size: 13px;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+  }
+
+  &__strategy-values {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+  }
+
+  &__strategy-value {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+
+    span {
+      color: $color-gray-500;
+      font-size: 12px;
+    }
+
+    strong {
+      color: $color-gray-900;
+      font-size: 15px;
+      font-weight: 600;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 28px;
+
+    button {
+      height: 44px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: $radius-sm;
+      background: $color-primary;
+      color: $color-white;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        background: $color-primary-hover;
+      }
+
+      &:disabled {
+        cursor: default;
+        opacity: 0.55;
+      }
+    }
+  }
+
+  &__error {
+    margin: 22px 0 0;
+    color: $color-rise;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  &__running {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+    padding: 18px 0;
+
+    > svg {
+      flex-shrink: 0;
+      color: $color-primary;
+      animation: backtest-spin 0.9s linear infinite;
+    }
+
+    strong {
+      color: $color-gray-900;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 5px 0 0;
+      color: $color-gray-500;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  }
+
+  &__result {
+    padding-top: 36px;
+  }
+
+  &__result-heading {
+    padding-bottom: 28px;
+
+    h2 {
+      margin: 12px 0 0;
+      color: $color-gray-900;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
+
+    p {
+      margin: 7px 0 0;
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+  }
+
+  &__completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: $color-primary-hover;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: 26px 0;
+    border-top: 1px solid $color-gray-200;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__metric {
+    min-width: 0;
+    padding: 0 20px;
+    border-right: 1px solid $color-gray-100;
+
+    &:first-child {
+      padding-left: 0;
+    }
+
+    &:last-child {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    span {
+      display: block;
+      color: $color-gray-500;
+      font-size: 12px;
+    }
+
+    strong {
+      display: block;
+      margin-top: 9px;
+      color: $color-gray-900;
+      font-size: 20px;
+      font-weight: 650;
+      letter-spacing: -0.3px;
+    }
+  }
+
+  &__result-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 0;
+    border-bottom: 1px solid $color-gray-200;
+
+    span {
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+
+    strong {
+      color: $color-gray-900;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  &__analysis {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 34px 0;
+
+    strong {
+      color: $color-gray-900;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 6px 0 0;
+      color: $color-gray-500;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    button {
+      height: 44px;
+      flex-shrink: 0;
+      padding: 0 20px;
+      border: 0;
+      border-radius: $radius-sm;
+      background: $color-primary;
+      color: $color-white;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: $color-primary-hover;
+      }
+    }
+  }
+
+  &__state {
+    display: flex;
+    min-height: 360px;
+    align-items: center;
+    justify-content: center;
+    color: $color-gray-500;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  @include mobile {
+    &__header {
+      margin-top: 22px;
+      padding-bottom: 26px;
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+
+    &__section {
+      padding: 28px 0;
+    }
+
+    &__fields {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    &__strategy-values {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 20px;
+    }
+
+    &__actions {
+      padding-top: 24px;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    &__running {
+      align-items: flex-start;
+    }
+
+    &__result {
+      padding-top: 30px;
+    }
+
+    &__result-heading {
+      h2 {
+        font-size: 22px;
+      }
+    }
+
+    &__metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 0;
+    }
+
+    &__metric {
+      padding: 20px 0;
+      border-right: 0;
+      border-bottom: 1px solid $color-gray-100;
+
+      &:nth-child(odd) {
+        padding-right: 18px;
+        border-right: 1px solid $color-gray-100;
+      }
+
+      &:nth-child(even) {
+        padding-left: 18px;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      strong {
+        font-size: 18px;
+      }
+    }
+
+    &__analysis {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 20px;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    &__state {
+      min-height: 280px;
+    }
+  }
+}
+
+@keyframes backtest-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
