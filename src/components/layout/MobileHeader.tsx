@@ -1,4 +1,4 @@
-import { LogOut, UserRound } from 'lucide-react';
+import { LogOut, UserRound, History } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { handleLogout } from '../../utils/logout';
@@ -54,6 +54,15 @@ function MobileHeader() {
             >
               <UserRound size={17} strokeWidth={1.8} />
               <span>내 계좌</span>
+            </Link>
+
+            <Link
+              to="/analysis-history"
+              className="mobile-header__menu-item"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <History size={17} strokeWidth={1.8} />
+              <span>분석 이력</span>
             </Link>
 
             <div className="mobile-header__menu-divider" />
