@@ -1,0 +1,559 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.ai-risk-page {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-gray-500;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: $color-gray-900;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid $color-gray-200;
+
+    h1 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.8px;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+  }
+
+  &__ready,
+  &__result {
+    width: 100%;
+  }
+
+  &__section {
+    padding: 32px 0;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__section-header {
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.4;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      margin: 7px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+  }
+
+  // 분석 시작 전 백테스트 핵심 지표
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid $color-gray-200;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__metric {
+    min-width: 0;
+    padding: 20px 22px;
+    border-right: 1px solid $color-gray-200;
+
+    &:first-child {
+      padding-left: 0;
+    }
+
+    &:last-child {
+      border-right: 0;
+    }
+
+    span {
+      display: block;
+      margin-bottom: 8px;
+      color: $color-gray-500;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    strong {
+      display: block;
+      overflow: hidden;
+      color: $color-gray-900;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.35;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  // 분석 시작 영역
+  &__guide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 32px 0;
+    border-bottom: 1px solid $color-gray-200;
+
+    > div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    strong {
+      display: block;
+      color: $color-gray-900;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    p {
+      max-width: 580px;
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    button {
+      flex-shrink: 0;
+      min-width: 148px;
+      height: 46px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: $radius-sm;
+      background: $color-primary;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background 0.15s ease,
+        opacity 0.15s ease;
+
+      &:hover:not(:disabled) {
+        background: $color-primary-hover;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+    }
+  }
+
+  // 분석 진행 중
+  &__pending {
+    display: flex;
+    min-height: 360px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+
+    svg {
+      margin-bottom: 20px;
+      color: $color-primary;
+      animation: ai-risk-spin 1s linear infinite;
+    }
+
+    strong {
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    p {
+      max-width: 430px;
+      margin: 10px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+  }
+
+  // 분석 결과 상단
+  &__result-summary {
+    padding: 32px 0;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__result-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 18px;
+    color: $color-gray-500;
+    font-size: 13px;
+    font-weight: 600;
+
+    svg {
+      color: $color-primary;
+    }
+  }
+
+  &__risk-heading {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+
+    > div {
+      span {
+        display: block;
+        margin-bottom: 7px;
+        color: $color-gray-500;
+        font-size: 13px;
+        font-weight: 500;
+      }
+    }
+
+    > p {
+      margin: 0;
+      padding-top: 3px;
+      color: $color-gray-700;
+      font-size: 16px;
+      line-height: 1.75;
+      word-break: keep-all;
+    }
+  }
+
+  &__risk-level {
+    display: inline-block;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.6px;
+
+    &--low {
+      color: $color-primary;
+    }
+
+    &--medium {
+      color: #c78300;
+    }
+
+    &--high {
+      color: $color-rise;
+    }
+  }
+
+  // 위험 요인
+  &__factors {
+    border-top: 1px solid $color-gray-200;
+  }
+
+  &__factor {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid $color-gray-100;
+
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    span {
+      color: $color-gray-700;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    p {
+      margin: 0;
+      color: $color-gray-700;
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+  }
+
+  // 분석 근거
+  &__reasoning {
+    margin: 0;
+    color: $color-gray-700;
+    font-size: 15px;
+    line-height: 1.85;
+    white-space: pre-line;
+    word-break: keep-all;
+  }
+
+  // 검토 사항
+  &__recommendations {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: recommendation;
+
+    li {
+      position: relative;
+      padding-left: 34px;
+      color: $color-gray-700;
+      font-size: 14px;
+      line-height: 1.75;
+      word-break: keep-all;
+      counter-increment: recommendation;
+
+      &::before {
+        position: absolute;
+        top: 1px;
+        left: 0;
+        display: flex;
+        width: 22px;
+        height: 22px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid $color-gray-300;
+        border-radius: 50%;
+        color: $color-gray-500;
+        content: counter(recommendation);
+        font-size: 11px;
+        font-weight: 700;
+      }
+    }
+  }
+
+  // 실패
+  &__failed {
+    display: flex;
+    min-height: 360px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+
+    > svg {
+      margin-bottom: 18px;
+      color: $color-rise;
+    }
+
+    strong {
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    p {
+      max-width: 460px;
+      margin: 10px 0 24px;
+      color: $color-gray-500;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    button {
+      display: inline-flex;
+      height: 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 18px;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-sm;
+      background: #fff;
+      color: $color-gray-700;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        border-color: $color-gray-400;
+        background: $color-gray-50;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+    }
+  }
+
+  &__error {
+    margin: 16px 0 0;
+    color: $color-rise;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  &__notice {
+    margin: 20px 0 0;
+    color: $color-gray-400;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  &__state {
+    display: flex;
+    min-height: 420px;
+    align-items: center;
+    justify-content: center;
+    color: $color-gray-500;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+@keyframes ai-risk-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@include mobile {
+  .ai-risk-page {
+    padding: 24px 20px 96px;
+
+    &__back {
+      margin-bottom: 22px;
+    }
+
+    &__header {
+      padding-bottom: 22px;
+
+      h1 {
+        font-size: 25px;
+      }
+
+      p {
+        margin-top: 6px;
+        font-size: 14px;
+      }
+    }
+
+    &__section {
+      padding: 26px 0;
+    }
+
+    &__section-header {
+      margin-bottom: 20px;
+
+      h2 {
+        font-size: 17px;
+      }
+    }
+
+    &__metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &__metric {
+      padding: 18px 16px;
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:nth-child(2) {
+        border-right: 0;
+      }
+
+      &:nth-child(-n + 2) {
+        border-bottom: 1px solid $color-gray-200;
+      }
+
+      &:nth-child(3) {
+        padding-left: 0;
+      }
+
+      strong {
+        font-size: 18px;
+      }
+    }
+
+    &__guide {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 22px;
+      padding: 26px 0;
+
+      button {
+        width: 100%;
+        height: 48px;
+      }
+    }
+
+    &__pending,
+    &__failed {
+      min-height: 320px;
+      padding: 48px 8px;
+    }
+
+    &__result-summary {
+      padding: 26px 0;
+    }
+
+    &__risk-heading {
+      grid-template-columns: 1fr;
+      gap: 18px;
+
+      > p {
+        padding-top: 0;
+        font-size: 15px;
+      }
+    }
+
+    &__risk-level {
+      font-size: 26px;
+    }
+
+    &__factor {
+      grid-template-columns: 1fr;
+      gap: 5px;
+      padding: 16px 0;
+    }
+
+    &__recommendations {
+      gap: 16px;
+    }
+
+    &__notice {
+      margin-top: 18px;
+    }
+  }
+}

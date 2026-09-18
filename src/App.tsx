@@ -12,6 +12,9 @@ import StockDetailPage from './pages/stocks/StockDetailPage';
 import StrategyCreatePage from './pages/strategies/StrategyCreatePage';
 import StrategyDetailPage from './pages/strategies/StrategyDetailPage';
 import BacktestPage from './pages/strategies/BacktestPage';
+import AiRiskAnalysisPage from './pages/strategies/AiRiskAnalysisPage';
+import AnalysisHistoryPage from './pages/history/AnalysisHistoryPage';
+import AiRiskAnalysisDetailPage from './pages/history/AiRiskAnalysisDetailPage';
 
 function App() {
   return (
@@ -29,6 +32,12 @@ function App() {
             <Route path="/strategies/:strategyId" element={<StrategyDetailPage />} />
             <Route path="/strategies" element={<StrategiesPage />} />
             <Route path="/strategies/:strategyId/backtest" element={<BacktestPage />} />
+            <Route
+              path="/strategies/:strategyId/backtests/:backtestId/analysis"
+              element={<AiRiskAnalysisPage />}
+            />
+            <Route path="/analysis-history" element={<AnalysisHistoryPage />} />
+            <Route path="/analysis-history/ai/:analysisId" element={<AiRiskAnalysisDetailPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/account" element={<AccountPage />} />
           </Route>
