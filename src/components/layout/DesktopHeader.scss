@@ -1,0 +1,132 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.desktop-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+
+  height: 68px;
+
+  background: rgba($color-white, 0.96);
+  border-bottom: 1px solid $color-gray-200;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    max-width: $content-max-width;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  &__brand {
+    flex-shrink: 0;
+
+    color: $color-navy-900;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+  }
+
+  &__navigation {
+    display: flex;
+    align-items: stretch;
+    align-self: stretch;
+    gap: 32px;
+
+    margin-left: 56px;
+  }
+
+  &__link {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    color: $color-gray-700;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+
+    transition: color 150ms ease;
+
+    &:hover {
+      color: $color-navy-900;
+    }
+
+    &--active {
+      color: $color-navy-900;
+      font-weight: 600;
+
+      &::after {
+        position: absolute;
+        right: 0;
+        bottom: -1px;
+        left: 0;
+
+        height: 2px;
+
+        background: $color-primary;
+
+        content: '';
+      }
+    }
+  }
+
+  &__account {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    gap: 7px;
+
+    margin-left: auto;
+
+    color: $color-gray-700;
+    font-size: 15px;
+    font-weight: 500;
+
+    transition: color 150ms ease;
+
+    &:hover {
+      color: $color-navy-900;
+    }
+
+    &--active {
+      color: $color-navy-900;
+      font-weight: 600;
+
+      &::after {
+        position: absolute;
+        right: 0;
+        bottom: -1px;
+        left: 0;
+
+        height: 2px;
+
+        background: $color-primary;
+
+        content: '';
+      }
+    }
+  }
+
+  @include tablet {
+    &__inner {
+      padding: 0 24px;
+    }
+
+    &__navigation {
+      gap: 24px;
+      margin-left: 40px;
+    }
+  }
+
+  @include mobile {
+    display: none;
+  }
+}

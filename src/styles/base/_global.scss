@@ -1,0 +1,22 @@
+@use '../abstracts/variables' as *;
+
+html {
+  background: $color-background;
+}
+
+body {
+  background: $color-background;
+  color: $color-gray-900;
+  font-family:
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}

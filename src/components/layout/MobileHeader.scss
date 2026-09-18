@@ -1,0 +1,36 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.mobile-header {
+  display: none;
+
+  @include mobile {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 20;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    height: $mobile-header-height;
+    padding: 0 16px;
+
+    background: $color-white;
+    border-bottom: 1px solid $color-gray-200;
+
+    &__brand {
+      color: $color-navy-900;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    &__account {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: $color-gray-700;
+    }
+  }
+}
