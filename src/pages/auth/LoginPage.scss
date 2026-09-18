@@ -1,1 +1,310 @@
-//scss
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.login-page {
+  min-height: 100vh;
+  background: $color-white;
+
+  &__content {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(520px, 44%);
+  }
+
+  // 왼쪽 브랜드 영역
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px max(72px, calc((100vw - 1440px) / 2));
+    background: $color-navy-900;
+
+    h1 {
+      max-width: 560px;
+      margin-top: 32px;
+      font-size: 44px;
+      line-height: 1.3;
+      letter-spacing: -1.5px;
+      color: $color-white;
+    }
+
+    p {
+      margin-top: 22px;
+      font-size: 17px;
+      line-height: 1.7;
+      color: $color-gray-400;
+    }
+  }
+
+  &__logo {
+    display: block;
+    width: 128px;
+    height: auto;
+  }
+
+  // 오른쪽 로그인 영역
+  &__form-area {
+    width: min(400px, calc(100% - 64px));
+    margin: auto;
+  }
+
+  &__heading {
+    margin-bottom: 36px;
+
+    h2 {
+      font-size: 30px;
+      line-height: 1.3;
+      letter-spacing: -0.7px;
+      color: $color-gray-900;
+    }
+
+    p {
+      margin-top: 8px;
+      font-size: 15px;
+      color: $color-gray-500;
+    }
+  }
+
+  &__signup {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 24px;
+    font-size: 14px;
+    color: $color-gray-500;
+
+    a {
+      color: $color-navy-900;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: $color-gray-700;
+    }
+
+    input {
+      width: 100%;
+      height: 50px;
+      padding: 0 15px;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-sm;
+      background: $color-white;
+      font-size: 15px;
+      color: $color-gray-900;
+      outline: none;
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+
+      &::placeholder {
+        color: $color-gray-400;
+      }
+
+      &:focus {
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+      }
+    }
+  }
+
+  &__password {
+    position: relative;
+
+    input {
+      padding-right: 48px;
+    }
+
+    button {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateY(-50%);
+      color: $color-gray-400;
+
+      &:hover {
+        color: $color-gray-700;
+      }
+    }
+  }
+
+  &__error {
+    margin-top: -6px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: $color-risk-high;
+  }
+
+  &__submit {
+    height: 52px;
+    margin-top: 4px;
+    border-radius: $radius-sm;
+    background: $color-primary;
+    color: $color-white;
+    font-size: 15px;
+    font-weight: 700;
+    transition: background 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: $color-primary-hover;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+  }
+}
+
+@include tablet {
+  .login-page {
+    &__content {
+      width: min(880px, calc(100% - 64px));
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 64px;
+    }
+
+    &__brand h1 {
+      font-size: 34px;
+    }
+  }
+}
+
+@include mobile {
+  .login-page {
+    min-height: 100dvh;
+    background: $color-navy-900;
+
+    &__content {
+      width: 100%;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      background: $color-navy-900;
+    }
+
+    &__brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      padding: 0;
+      background: transparent;
+
+      h1,
+      p {
+        display: none;
+      }
+    }
+
+    &__logo {
+      width: 132px;
+      height: auto;
+    }
+
+    &__form-area {
+      width: 100%;
+      max-width: 400px;
+      margin: 40px 0 0;
+      padding: 0;
+    }
+
+    &__heading {
+      margin-bottom: 32px;
+      text-align: center;
+
+      h2 {
+        font-size: 28px;
+        line-height: 1.3;
+        color: $color-white;
+      }
+
+      p {
+        margin-top: 8px;
+        font-size: 15px;
+        color: $color-gray-400;
+      }
+    }
+
+    &__signup {
+      margin-top: 24px;
+      color: $color-gray-400;
+
+      a {
+        color: $color-white;
+      }
+    }
+  }
+
+  .login-form {
+    &__field {
+      label {
+        color: $color-gray-200;
+      }
+
+      input {
+        border-color: $color-gray-700;
+        background: $color-navy-800;
+        color: $color-white;
+
+        &::placeholder {
+          color: $color-gray-400;
+        }
+
+        &:focus {
+          border-color: $color-primary;
+          box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+        }
+      }
+    }
+
+    &__password {
+      button {
+        color: $color-gray-400;
+
+        &:hover {
+          color: $color-white;
+        }
+      }
+    }
+
+    &__error {
+      color: #ff6b6b;
+    }
+
+    &__submit {
+      background: $color-primary;
+
+      &:hover:not(:disabled) {
+        background: $color-primary-hover;
+      }
+    }
+  }
+}
