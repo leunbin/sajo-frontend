@@ -2,7 +2,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { login } from '../../api/auth';
+import { getMe, login } from '../../api/auth';
 import { tokenStorage } from '../../utils/tokenStorage';
 import './LoginPage.scss';
 
@@ -33,6 +33,13 @@ function LoginPage() {
       });
 
       tokenStorage.setTokens(response.accessToken, response.refreshToken);
+
+      const user = await getMe();
+
+      if (user.role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+        return;
+      }
 
       navigate('/', { replace: true });
     } catch (error) {
@@ -70,6 +77,7 @@ function LoginPage() {
           <form onSubmit={handleSubmit} className="login-form">
             <div className="login-form__field">
               <label htmlFor="email">이메일</label>
+
               <input
                 id="email"
                 type="email"
