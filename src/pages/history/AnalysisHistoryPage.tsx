@@ -1,4 +1,4 @@
-import { AlertCircle, BrainCircuit, ChevronRight, LoaderCircle } from 'lucide-react';
+import { AlertCircle, ChevronRight, LoaderCircle, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -162,7 +162,7 @@ function AnalysisHistoryPage() {
 
             {!isLoading && !errorMessage && histories.length === 0 && (
               <div className="analysis-history__empty">
-                <BrainCircuit size={30} strokeWidth={1.6} />
+                <ShieldCheck size={30} strokeWidth={1.6} />
                 <strong>아직 AI 위험 분석 이력이 없습니다.</strong>
                 <p>백테스트를 완료한 뒤 전략의 위험도를 분석해보세요.</p>
               </div>
