@@ -56,17 +56,22 @@ function LoginPage() {
   return (
     <main className="login-page">
       <section className="login-page__content">
-        <div className="login-page__brand">
-          <img src="/4jo-logo.svg" alt="4JO" className="login-page__logo" />
+        <section className="login-page__brand">
+          <div className="login-page__brand-content">
+            <img src="/4jo-logo.svg" alt="4JO" className="login-page__logo" />
 
-          <h1>내 전략을 확인하고, 더 신중하게 투자하세요.</h1>
+            <h1>
+              내 전략을 확인하고,
+              <br />더 신중하게 투자하세요.
+            </h1>
 
-          <p>
-            백테스트부터 위험 분석, 자동매매까지
-            <br />
-            하나의 흐름으로 관리할 수 있습니다.
-          </p>
-        </div>
+            <p>
+              백테스트부터 위험 분석, 자동매매까지
+              <br />
+              하나의 흐름으로 관리할 수 있습니다.
+            </p>
+          </div>
+        </section>
 
         <div className="login-page__form-area">
           <div className="login-page__heading">
