@@ -1,9 +1,6 @@
 @use '../../styles/abstracts/variables' as *;
 @use '../../styles/abstracts/mixins' as *;
 
-@use '../../styles/abstracts/variables' as *;
-@use '../../styles/abstracts/mixins' as *;
-
 .login-page {
   min-height: 100vh;
   background: $color-white;
@@ -24,19 +21,24 @@
     background: $color-navy-900;
 
     h1 {
-      max-width: 560px;
+      width: 100%;
+      max-width: 620px;
       margin-top: 32px;
+      color: $color-white;
       font-size: 44px;
       line-height: 1.3;
       letter-spacing: -1.5px;
-      color: $color-white;
+      word-break: keep-all;
+      overflow-wrap: normal;
     }
 
     p {
+      max-width: 560px;
       margin-top: 22px;
+      color: $color-gray-400;
       font-size: 17px;
       line-height: 1.7;
-      color: $color-gray-400;
+      word-break: keep-all;
     }
   }
 
@@ -183,13 +185,21 @@
 @include tablet {
   .login-page {
     &__content {
-      width: min(880px, calc(100% - 64px));
-      grid-template-columns: minmax(0, 1fr) 360px;
-      gap: 64px;
+      width: 100%;
+      grid-template-columns: minmax(0, 1fr) 400px;
     }
 
-    &__brand h1 {
-      font-size: 34px;
+    &__brand {
+      padding: 64px 48px;
+
+      h1 {
+        max-width: 480px;
+        font-size: 36px;
+      }
+
+      p {
+        font-size: 15px;
+      }
     }
   }
 }
