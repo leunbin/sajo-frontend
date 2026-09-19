@@ -6,49 +6,56 @@
   background: $color-white;
 
   &__content {
+    display: grid;
     width: 100%;
     min-height: 100vh;
-
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(520px, 44%);
+    grid-template-columns: minmax(560px, 1fr) minmax(480px, 42%);
   }
 
+  // 왼쪽 브랜드 영역
+  // LoginPage와 동일한 레이아웃
   &__brand {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
-
-    padding: 80px max(72px, calc((100vw - 1440px) / 2));
-
+    padding: 80px 56px;
     background: $color-navy-900;
+  }
+
+  &__brand-content {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
 
     h1 {
-      width: 100%;
-      max-width: 620px;
-      margin-top: 32px;
+      margin: 0;
       color: $color-white;
-      font-size: 44px;
+      font-size: 40px;
+      font-weight: 700;
       line-height: 1.3;
-      letter-spacing: -1.5px;
+      letter-spacing: -1.4px;
       word-break: keep-all;
-      overflow-wrap: normal;
     }
 
     p {
-      max-width: 560px;
-      margin-top: 22px;
+      margin: 24px 0 0;
       color: $color-gray-400;
-      font-size: 17px;
+      font-size: 16px;
       line-height: 1.7;
       word-break: keep-all;
     }
   }
 
   &__logo {
+    position: absolute;
+    bottom: calc(100% + 48px);
+    left: 0;
+    display: block;
     width: 128px;
     height: auto;
   }
 
+  // 오른쪽 회원가입 영역
   &__form-area {
     width: min(400px, calc(100% - 64px));
     margin: auto;
@@ -59,6 +66,7 @@
     margin-bottom: 32px;
 
     h2 {
+      margin: 0;
       color: $color-gray-900;
       font-size: 30px;
       line-height: 1.3;
@@ -66,7 +74,7 @@
     }
 
     p {
-      margin-top: 8px;
+      margin: 8px 0 0;
       color: $color-gray-500;
       font-size: 15px;
     }
@@ -76,9 +84,7 @@
     display: flex;
     justify-content: center;
     gap: 7px;
-
     margin-top: 24px;
-
     color: $color-gray-500;
     font-size: 14px;
 
@@ -113,15 +119,12 @@
       width: 100%;
       height: 50px;
       padding: 0 15px;
-
-      background: $color-white;
       border: 1px solid $color-gray-300;
       border-radius: $radius-sm;
-
+      outline: none;
+      background: $color-white;
       color: $color-gray-900;
       font-size: 15px;
-      outline: none;
-
       transition:
         border-color 150ms ease,
         box-shadow 150ms ease;
@@ -148,11 +151,9 @@
       position: absolute;
       top: 50%;
       right: 14px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       transform: translateY(-50%);
       color: $color-gray-400;
 
@@ -164,7 +165,6 @@
 
   &__error {
     margin-top: -4px;
-
     color: $color-risk-high;
     font-size: 13px;
     line-height: 1.5;
@@ -173,10 +173,8 @@
   &__submit {
     height: 52px;
     margin-top: 2px;
-
-    background: $color-primary;
     border-radius: $radius-sm;
-
+    background: $color-primary;
     color: $color-white;
     font-size: 15px;
     font-weight: 700;
@@ -195,21 +193,31 @@
 @include tablet {
   .signup-page {
     &__content {
-      width: 100%;
       grid-template-columns: minmax(0, 1fr) 400px;
     }
 
     &__brand {
-      padding: 64px 48px;
+      padding: 64px 40px;
+    }
+
+    &__brand-content {
+      max-width: 440px;
 
       h1 {
-        max-width: 480px;
-        font-size: 36px;
+        font-size: 32px;
+        line-height: 1.35;
+        letter-spacing: -1px;
       }
 
       p {
-        font-size: 15px;
+        margin-top: 20px;
+        font-size: 14px;
       }
+    }
+
+    &__logo {
+      bottom: calc(100% + 40px);
+      width: 112px;
     }
   }
 }
@@ -220,24 +228,30 @@
     background: $color-navy-900;
 
     &__content {
+      display: flex;
       width: 100%;
       min-height: 100dvh;
-
-      display: flex;
       flex-direction: column;
       align-items: center;
-
       padding: 48px 24px;
-
       background: $color-navy-900;
     }
 
     &__brand {
+      display: flex;
       flex: none;
       align-items: center;
-
+      justify-content: center;
       padding: 0;
       background: transparent;
+    }
+
+    &__brand-content {
+      display: flex;
+      width: auto;
+      max-width: none;
+      align-items: center;
+      justify-content: center;
 
       h1,
       p {
@@ -246,13 +260,14 @@
     }
 
     &__logo {
-      width: 120px;
+      position: static;
+      width: 132px;
+      height: auto;
     }
 
     &__form-area {
       width: 100%;
       max-width: 400px;
-
       margin: 36px 0 0;
       padding: 0;
     }
@@ -288,8 +303,8 @@
       }
 
       input {
-        background: $color-navy-800;
         border-color: $color-gray-700;
+        background: $color-navy-800;
         color: $color-white;
 
         &::placeholder {
@@ -303,8 +318,14 @@
       }
     }
 
-    &__password button {
-      color: $color-gray-400;
+    &__password {
+      button {
+        color: $color-gray-400;
+
+        &:hover {
+          color: $color-white;
+        }
+      }
     }
 
     &__error {
