@@ -1,0 +1,316 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.stock-detail {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: $color-gray-500;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  &__header {
+    margin-top: 32px;
+
+    h1 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+    }
+
+    p {
+      margin: 7px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+    }
+  }
+
+  &__quote {
+    margin-top: 32px;
+
+    > strong {
+      display: block;
+      margin-top: 6px;
+      color: $color-gray-900;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+    }
+  }
+
+  &__label {
+    color: $color-gray-500;
+    font-size: 13px;
+  }
+
+  &__change {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+
+    &--rise {
+      color: $color-rise;
+    }
+
+    &--fall {
+      color: $color-fall;
+    }
+  }
+
+  &__section {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid $color-gray-200;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    span {
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+  }
+
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 24px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    span {
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+
+    strong {
+      color: $color-gray-900;
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+
+  // Chart period
+  &__periods {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__period {
+    padding: 7px 10px;
+    border: 0;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: $color-gray-500;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover {
+      background: $color-gray-100;
+      color: $color-gray-900;
+    }
+
+    &--active {
+      background: $color-gray-100;
+      color: $color-gray-900;
+      font-weight: 600;
+    }
+  }
+
+  // Candlestick chart
+  &__chart {
+    width: 100%;
+    height: 300px;
+    margin-top: 28px;
+  }
+
+  &__chart-state {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    color: $color-gray-400;
+    font-size: 14px;
+
+    &--error {
+      color: $color-rise;
+    }
+  }
+
+  // Candlestick tooltip
+  &__candle-tooltip {
+    min-width: 150px;
+    padding: 12px 14px;
+    border: 1px solid $color-gray-200;
+    border-radius: $radius-sm;
+    background: $color-white;
+    box-shadow: 0 4px 12px rgb(17 24 39 / 8%);
+
+    > strong {
+      display: block;
+      margin-bottom: 10px;
+      color: $color-gray-900;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    dl {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+    }
+
+    dl > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    dt {
+      color: $color-gray-500;
+      font-size: 12px;
+    }
+
+    dd {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+
+  &__strategy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    margin-top: 48px;
+    padding: 28px 0;
+    border-top: 1px solid $color-gray-200;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+    }
+
+    button {
+      flex-shrink: 0;
+      height: 44px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: $radius-sm;
+      background: $color-primary;
+      color: $color-white;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: $color-primary-hover;
+      }
+    }
+  }
+
+  &__state {
+    padding: 80px 0;
+    color: $color-gray-500;
+    text-align: center;
+  }
+
+  @include mobile {
+    &__header {
+      margin-top: 24px;
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+
+    &__quote {
+      margin-top: 28px;
+
+      > strong {
+        font-size: 30px;
+      }
+    }
+
+    &__section {
+      margin-top: 40px;
+      padding-top: 24px;
+    }
+
+    &__section-header {
+      gap: 12px;
+    }
+
+    &__metrics {
+      gap: 16px;
+
+      strong {
+        font-size: 18px;
+      }
+    }
+
+    &__period {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    &__chart {
+      height: 240px;
+      margin-top: 20px;
+    }
+
+    &__strategy {
+      align-items: stretch;
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

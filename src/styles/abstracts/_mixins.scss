@@ -1,0 +1,172 @@
+@use './variables' as *;
+
+// -------------------------------------------------------------
+// Breakpoints (기존 그대로)
+// -------------------------------------------------------------
+
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-mobile + 1px}) and (max-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-tablet + 1px}) {
+    @content;
+  }
+}
+
+// -------------------------------------------------------------
+// numeric — 금융 UI에서 체감이 제일 큰 부분.
+// 현재 코드에 tabular-nums 가 단 한 곳도 없어서 테이블 숫자가
+// 스크롤/갱신할 때마다 자릿수만큼 미세하게 흔들림.
+// 가격·수량·수익률·잔고 전부에 적용할 것.
+// -------------------------------------------------------------
+
+@mixin numeric($weight: $fw-medium) {
+  font-family: $font-numeric;
+  font-weight: $weight;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'ss01' 1;
+  letter-spacing: -0.01em;
+}
+
+// 큰 핵심 숫자 (총자산, 평가손익 등 화면당 1개)
+@mixin numeric-display {
+  @include numeric($fw-bold);
+
+  font-size: $text-4xl;
+  line-height: 1.1;
+  letter-spacing: $tracking-tight;
+}
+
+// -------------------------------------------------------------
+// Typography presets — 사이즈/웨이트/자간을 짝으로 묶어
+// 개별 선언이 다시 23종으로 번지는 걸 막음
+// -------------------------------------------------------------
+
+@mixin text-page-title {
+  font-size: $text-2xl;
+  font-weight: $fw-bold;
+  line-height: $leading-tight;
+  letter-spacing: $tracking-tight;
+  color: $color-gray-900;
+}
+
+@mixin text-section-title {
+  font-size: $text-lg;
+  font-weight: $fw-bold;
+  line-height: 1.35;
+  letter-spacing: $tracking-snug;
+  color: $color-gray-900;
+}
+
+@mixin text-body {
+  font-size: $text-sm;
+  font-weight: $fw-regular;
+  line-height: $leading-normal;
+  letter-spacing: $tracking-normal;
+  color: $color-gray-700;
+}
+
+@mixin text-support {
+  font-size: $text-xs;
+  font-weight: $fw-regular;
+  line-height: $leading-relaxed;
+  color: $color-gray-500;
+}
+
+// 테이블 헤더 / 라벨
+@mixin text-label {
+  font-size: $text-2xs;
+  font-weight: $fw-medium;
+  line-height: 1.4;
+  color: $color-gray-500;
+}
+
+// -------------------------------------------------------------
+// focus-ring — 현재 :focus 에 box-shadow 링이 제각각으로 9곳.
+// 하나로 통일하고 마우스 클릭에는 안 뜨게.
+// -------------------------------------------------------------
+
+@mixin focus-ring($color: $color-primary) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: 2px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+// 인풋처럼 테두리 자체가 반응해야 하는 경우
+@mixin focus-field($color: $color-primary) {
+  &:focus-visible,
+  &:focus-within {
+    border-color: $color;
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(162 44% 29% / 0.14);
+  }
+}
+
+// -------------------------------------------------------------
+// Emphasis — rgb(22 199 132 / 3%) 처럼 안 보이는 틴트 대신
+// 왼쪽 컬러 바로 확실하게 표시
+// -------------------------------------------------------------
+
+@mixin row-accent($color: $color-primary) {
+  box-shadow: inset 2px 0 0 $color;
+}
+
+@mixin surface {
+  background: $color-white;
+  border: $border-section;
+  border-radius: $radius-surface;
+}
+
+// -------------------------------------------------------------
+// Motion — 단위 혼용 정리 + 접근성
+// -------------------------------------------------------------
+
+@mixin transition($props...) {
+  $list: ();
+
+  @each $prop in $props {
+    $list: append($list, #{$prop} $duration-base $ease-out, comma);
+  }
+
+  transition: $list;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+@mixin reduced-motion-safe {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+// -------------------------------------------------------------
+// Section — 밀도 대비를 만드는 핵심.
+// 기존 padding: 34px 0 → 64px 0 (모바일 40px)
+// -------------------------------------------------------------
+
+@mixin section {
+  padding: $section-gap 0;
+  border-top: $border-section;
+
+  @include mobile {
+    padding: $section-gap-mobile 0;
+  }
+}

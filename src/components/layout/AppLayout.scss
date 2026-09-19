@@ -1,0 +1,27 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.app-layout {
+  min-height: 100vh;
+
+  &__content {
+    width: 100%;
+    max-width: $content-max-width;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+  @include tablet {
+    &__content {
+      padding: 32px 24px;
+    }
+  }
+
+  @include mobile {
+    &__content {
+      padding: 24px 16px;
+      padding-top: calc($mobile-header-height + 24px);
+      padding-bottom: calc($mobile-bottom-nav-height + 24px);
+    }
+  }
+}
