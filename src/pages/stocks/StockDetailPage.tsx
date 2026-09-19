@@ -162,6 +162,15 @@ function StockDetailPage() {
   const [chartError, setChartError] = useState('');
 
   useEffect(() => {
+    if (!summary?.stock.stockName) {
+      document.title = '종목 | SAJO';
+      return;
+    }
+
+    document.title = `${summary.stock.stockName} | SAJO`;
+  }, [summary]);
+
+  useEffect(() => {
     if (!stockCode) {
       return;
     }

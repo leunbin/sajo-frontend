@@ -15,10 +15,12 @@ import BacktestPage from './pages/strategies/BacktestPage';
 import AiRiskAnalysisPage from './pages/strategies/AiRiskAnalysisPage';
 import AnalysisHistoryPage from './pages/history/AnalysisHistoryPage';
 import AiRiskAnalysisDetailPage from './pages/history/AiRiskAnalysisDetailPage';
+import PageTitle from './components/common/PageTitle';
 
 function App() {
   return (
     <BrowserRouter>
+      <PageTitle />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />

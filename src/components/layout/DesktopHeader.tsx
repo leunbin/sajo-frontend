@@ -2,6 +2,7 @@ import { ChevronDown, History, LogOut, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { handleLogout } from '../../utils/logout';
+import { getMe } from '../../api/auth';
 import './DesktopHeader.scss';
 
 const navigation = [
@@ -15,11 +16,25 @@ function DesktopHeader() {
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userName, setUserName] = useState('');
 
   const onLogout = async () => {
     await handleLogout();
     navigate('/login', { replace: true });
   };
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const user = await getMe();
+        setUserName(user.name);
+      } catch {
+        setUserName('');
+      }
+    };
+
+    void loadUser();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -69,7 +84,7 @@ function DesktopHeader() {
               <UserRound size={18} strokeWidth={1.8} />
             </span>
 
-            <span>내 계정</span>
+            <span>{userName || '내 계정'}</span>
 
             <ChevronDown
               size={15}
