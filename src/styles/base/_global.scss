@@ -1,4 +1,5 @@
 @use '../abstracts/variables' as *;
+@import 'pretendard/dist/web/static/pretendard.css';
 
 html {
   background: $color-background;
@@ -8,12 +9,13 @@ body {
   background: $color-background;
   color: $color-gray-900;
   font-family:
-    Pretendard,
+    'Pretendard',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     sans-serif;
   line-height: 1.5;
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-user-select: none;

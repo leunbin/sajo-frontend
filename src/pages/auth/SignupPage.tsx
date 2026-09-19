@@ -111,21 +111,23 @@ function SignupPage() {
   return (
     <main className="signup-page">
       <section className="signup-page__content">
-        <div className="signup-page__brand">
-          <img src="/4jo-logo.svg" alt="4JO" className="signup-page__logo" />
+        <section className="signup-page__brand">
+          <div className="signup-page__brand-content">
+            <img src="/4jo-logo.svg" alt="4JO" className="signup-page__logo" />
 
-          <h1>
-            나만의 투자 전략을
-            <br />
-            시작해보세요.
-          </h1>
+            <h1>
+              나만의 투자 전략을
+              <br />
+              시작해보세요.
+            </h1>
 
-          <p>
-            전략을 만들고 백테스트한 뒤
-            <br />
-            위험을 확인하고 자동매매까지 관리할 수 있습니다.
-          </p>
-        </div>
+            <p>
+              전략을 만들고 백테스트한 후
+              <br />
+              위험을 확인하고 자동매매까지 관리할 수 있습니다.
+            </p>
+          </div>
+        </section>
 
         <div className="signup-page__form-area">
           <div className="signup-page__heading">
