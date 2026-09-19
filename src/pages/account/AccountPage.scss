@@ -1,0 +1,1131 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.account-page {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  &__spinner {
+    flex-shrink: 0;
+    animation: account-spin 0.8s linear infinite;
+  }
+
+  // ─────────────────────────────────────
+  // Header
+  // ─────────────────────────────────────
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 34px;
+
+    h1 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.7px;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  }
+
+  &__refresh {
+    display: inline-flex;
+    height: 36px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 3px;
+    padding: 0 12px;
+    color: $color-gray-500;
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+    background: $color-white;
+    border: 1px solid $color-gray-300;
+    border-radius: $radius-sm;
+    cursor: pointer;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    &:hover:not(:disabled) {
+      color: $color-gray-900;
+      background: $color-gray-50;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Sections
+  // ─────────────────────────────────────
+
+  &__section {
+    padding: 34px 0;
+    border-top: 1px solid $color-gray-200;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    p {
+      margin: 7px 0 0;
+      color: $color-gray-500;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Empty account
+  // ─────────────────────────────────────
+
+  &__empty {
+    display: flex;
+    min-height: 430px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    text-align: center;
+    border-top: 1px solid $color-gray-200;
+
+    > strong {
+      margin-top: 18px;
+      color: $color-gray-900;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    > p {
+      max-width: 390px;
+      margin: 9px 0 0;
+      color: $color-gray-500;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    > button {
+      margin-top: 25px;
+    }
+  }
+
+  &__empty-icon {
+    display: flex;
+    width: 52px;
+    height: 52px;
+    align-items: center;
+    justify-content: center;
+    color: $color-primary-hover;
+    background: rgb(22 199 132 / 7%);
+    border-radius: 50%;
+  }
+
+  // ─────────────────────────────────────
+  // Buttons
+  // ─────────────────────────────────────
+
+  &__primary-button,
+  &__secondary-button {
+    display: inline-flex;
+    min-width: 108px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: $radius-sm;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+  }
+
+  &__primary-button {
+    color: $color-white;
+    background: $color-primary;
+    border: 1px solid $color-primary;
+
+    &:hover:not(:disabled) {
+      background: $color-primary-hover;
+      border-color: $color-primary-hover;
+    }
+  }
+
+  &__secondary-button {
+    color: $color-gray-700;
+    background: $color-white;
+    border: 1px solid $color-gray-300;
+
+    &:hover:not(:disabled) {
+      color: $color-gray-900;
+      background: $color-gray-50;
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Connection form
+  // ─────────────────────────────────────
+
+  &__connect {
+    padding-top: 32px;
+    border-top: 1px solid $color-gray-200;
+  }
+
+  &__connect-form {
+    max-width: 620px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+
+    > span {
+      color: $color-gray-700;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    > input {
+      width: 100%;
+      height: 44px;
+      padding: 0 13px;
+      color: $color-gray-900;
+      background: $color-white;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-sm;
+      outline: none;
+
+      &::placeholder {
+        color: $color-gray-400;
+      }
+
+      &:focus {
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgb(22 199 132 / 8%);
+      }
+
+      &:disabled {
+        background: $color-gray-50;
+        cursor: not-allowed;
+      }
+    }
+
+    > small {
+      color: $color-gray-400;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+  }
+
+  &__field-label {
+    display: block;
+    margin-bottom: 10px;
+    color: $color-gray-700;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  &__type-field {
+    margin-bottom: 4px;
+  }
+
+  &__type-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  &__type-option {
+    position: relative;
+    display: flex;
+    min-height: 70px;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    background: $color-white;
+    border: 1px solid $color-gray-300;
+    border-radius: $radius-sm;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    > div {
+      min-width: 0;
+
+      strong {
+        display: block;
+        color: $color-gray-700;
+        font-size: 13px;
+        font-weight: 650;
+      }
+
+      small {
+        display: block;
+        margin-top: 4px;
+        color: $color-gray-400;
+        font-size: 11px;
+        line-height: 1.4;
+      }
+    }
+
+    &--selected {
+      border-color: $color-primary;
+      background: rgb(22 199 132 / 3%);
+
+      > div strong {
+        color: $color-gray-900;
+      }
+    }
+
+    &:has(input:disabled) {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__radio {
+    display: flex;
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $color-gray-300;
+    border-radius: 50%;
+
+    > span {
+      width: 9px;
+      height: 9px;
+      background: transparent;
+      border-radius: 50%;
+    }
+
+    .account-page__type-option--selected & {
+      border-color: $color-primary;
+
+      > span {
+        background: $color-primary;
+      }
+    }
+  }
+
+  &__secret-input {
+    display: flex;
+    width: 100%;
+    height: 44px;
+    align-items: center;
+    background: $color-white;
+    border: 1px solid $color-gray-300;
+    border-radius: $radius-sm;
+
+    &:focus-within {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgb(22 199 132 / 8%);
+    }
+
+    input {
+      min-width: 0;
+      height: 100%;
+      flex: 1;
+      padding: 0 13px;
+      color: $color-gray-900;
+      background: transparent;
+      border: 0;
+      outline: none;
+
+      &::placeholder {
+        color: $color-gray-400;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+    }
+
+    button {
+      display: flex;
+      width: 42px;
+      height: 100%;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      color: $color-gray-400;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        color: $color-gray-700;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &__real-warning,
+  &__security-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: $radius-sm;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+  }
+
+  &__real-warning {
+    color: $color-rise;
+    background: rgb(229 72 77 / 5%);
+    border: 1px solid rgb(229 72 77 / 15%);
+  }
+
+  &__security-note {
+    color: $color-gray-500;
+    background: $color-gray-50;
+    border: 1px solid $color-gray-100;
+  }
+
+  &__form-error {
+    margin: 14px 0 0;
+    color: $color-rise;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  &__form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 24px;
+  }
+
+  // ─────────────────────────────────────
+  // Asset summary
+  // ─────────────────────────────────────
+
+  &__asset-main {
+    padding-bottom: 26px;
+    border-bottom: 1px solid $color-gray-100;
+
+    > span {
+      display: block;
+      margin-bottom: 8px;
+      color: $color-gray-500;
+      font-size: 12px;
+    }
+
+    > strong {
+      display: block;
+      color: $color-gray-900;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  &__asset-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    padding-top: 25px;
+  }
+
+  &__asset-value {
+    min-width: 0;
+
+    > span {
+      display: block;
+      margin-bottom: 8px;
+      color: $color-gray-500;
+      font-size: 12px;
+    }
+
+    > strong {
+      display: block;
+      overflow: hidden;
+      color: $color-gray-900;
+      font-size: 15px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__number--rise {
+    color: $color-rise !important;
+  }
+
+  &__number--fall {
+    color: $color-fall !important;
+  }
+
+  &__asset-loading,
+  &__asset-unavailable {
+    display: flex;
+    min-height: 150px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: $color-gray-500;
+    font-size: 12px;
+  }
+
+  &__asset-loading {
+    .account-page__spinner {
+      color: $color-primary;
+    }
+  }
+
+  &__asset-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 11px 13px;
+    color: $color-rise;
+    font-size: 11px;
+    background: rgb(229 72 77 / 4%);
+    border: 1px solid rgb(229 72 77 / 12%);
+    border-radius: $radius-sm;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    span {
+      flex: 1;
+    }
+
+    button {
+      flex-shrink: 0;
+      padding: 0;
+      color: $color-rise;
+      font-size: 11px;
+      font-weight: 700;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Holdings
+  // ─────────────────────────────────────
+
+  &__holdings-table {
+    width: 100%;
+  }
+
+  &__holding-head,
+  &__holding-row {
+    display: grid;
+    grid-template-columns:
+      minmax(150px, 1.5fr)
+      minmax(95px, 0.8fr)
+      minmax(110px, 0.9fr)
+      minmax(100px, 0.8fr)
+      minmax(110px, 0.9fr)
+      minmax(110px, 0.9fr);
+    gap: 14px;
+    align-items: center;
+  }
+
+  &__holding-head {
+    min-height: 37px;
+    padding: 0 12px;
+    color: $color-gray-400;
+    font-size: 11px;
+    border-bottom: 1px solid $color-gray-200;
+
+    span:not(:first-child) {
+      text-align: right;
+    }
+  }
+
+  &__holding-row {
+    position: relative;
+    width: 100%;
+    min-height: 72px;
+    padding: 11px 12px;
+    color: $color-gray-700;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid $color-gray-100;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-gray-50;
+    }
+
+    > span:not(:first-child) {
+      color: $color-gray-700;
+      font-size: 12px;
+      text-align: right;
+
+      > small {
+        display: block;
+        margin-top: 4px;
+        color: $color-gray-400;
+        font-size: 10px;
+      }
+
+      > strong {
+        display: block;
+        font-size: 12px;
+        font-weight: 650;
+      }
+    }
+  }
+
+  &__holding-stock {
+    min-width: 0;
+
+    strong {
+      display: block;
+      overflow: hidden;
+      color: $color-gray-900;
+      font-size: 13px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    small {
+      display: block;
+      margin-top: 5px;
+      color: $color-gray-400;
+      font-size: 10px;
+    }
+  }
+
+  &__holding-arrow {
+    display: none;
+  }
+
+  &__holdings-empty {
+    display: flex;
+    min-height: 190px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: $color-gray-400;
+    text-align: center;
+
+    > strong {
+      margin-top: 12px;
+      color: $color-gray-700;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    > p {
+      margin: 6px 0 0;
+      color: $color-gray-400;
+      font-size: 11px;
+    }
+  }
+
+  &__more {
+    display: flex;
+    justify-content: center;
+    padding-top: 18px;
+
+    button {
+      display: inline-flex;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 14px;
+      color: $color-gray-500;
+      font-size: 11px;
+      font-weight: 650;
+      background: $color-white;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-sm;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        color: $color-gray-900;
+        background: $color-gray-50;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Connected account
+  // ─────────────────────────────────────
+
+  &__connection-row {
+    display: flex;
+    min-height: 72px;
+    align-items: center;
+    gap: 13px;
+    padding: 12px 0;
+  }
+
+  &__connection-icon {
+    display: flex;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    color: $color-primary-hover;
+    background: rgb(22 199 132 / 7%);
+    border-radius: 50%;
+  }
+
+  &__connection-info {
+    min-width: 0;
+    flex: 1;
+
+    strong {
+      display: block;
+      color: $color-gray-900;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    span {
+      display: block;
+      margin-top: 5px;
+      color: $color-gray-500;
+      font-size: 12px;
+    }
+  }
+
+  &__account-type {
+    display: inline-flex;
+    height: 25px;
+    flex-shrink: 0;
+    align-items: center;
+    padding: 0 9px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+
+    &--virtual {
+      color: $color-primary-hover;
+      background: rgb(22 199 132 / 7%);
+    }
+
+    &--real {
+      color: $color-rise;
+      background: rgb(229 72 77 / 6%);
+    }
+  }
+
+  &__disconnect {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 18px;
+    padding: 25px 0;
+    border-top: 1px solid $color-gray-100;
+
+    > div {
+      strong {
+        display: block;
+        color: $color-gray-700;
+        font-size: 12px;
+        font-weight: 650;
+      }
+
+      p {
+        margin: 6px 0 0;
+        color: $color-gray-400;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+    }
+
+    > button {
+      display: inline-flex;
+      min-width: 100px;
+      height: 36px;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 13px;
+      color: $color-gray-500;
+      font-size: 11px;
+      font-weight: 650;
+      background: $color-white;
+      border: 1px solid $color-gray-300;
+      border-radius: $radius-sm;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        color: $color-rise;
+        background: rgb(229 72 77 / 3%);
+        border-color: rgb(229 72 77 / 30%);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  &__disconnect-error {
+    margin: 8px 0 0;
+    color: $color-rise;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  // ─────────────────────────────────────
+  // Page state
+  // ─────────────────────────────────────
+
+  &__state {
+    display: flex;
+    min-height: 480px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: $color-gray-500;
+    text-align: center;
+
+    > .account-page__spinner {
+      margin-bottom: 10px;
+      color: $color-primary;
+    }
+
+    > span {
+      font-size: 13px;
+    }
+
+    &--error {
+      > svg {
+        color: $color-rise;
+      }
+
+      > strong {
+        margin-top: 12px;
+        color: $color-gray-900;
+        font-size: 14px;
+      }
+
+      > p {
+        margin: 7px 0 0;
+        color: $color-gray-500;
+        font-size: 12px;
+      }
+
+      > button {
+        margin-top: 18px;
+        padding: 0;
+        color: $color-primary-hover;
+        font-size: 12px;
+        font-weight: 700;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+      }
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Tablet
+  // ─────────────────────────────────────
+
+  @include tablet {
+    &__asset-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__holding-head,
+    &__holding-row {
+      grid-template-columns:
+        minmax(140px, 1.4fr)
+        minmax(85px, 0.7fr)
+        minmax(100px, 0.8fr)
+        minmax(100px, 0.8fr)
+        minmax(110px, 0.9fr);
+
+      > span:nth-child(3) {
+        display: none;
+      }
+    }
+  }
+
+  // ─────────────────────────────────────
+  // Mobile
+  // ─────────────────────────────────────
+
+  @include mobile {
+    padding-bottom: 50px;
+
+    &__header {
+      gap: 15px;
+      padding-bottom: 27px;
+
+      h1 {
+        font-size: 25px;
+      }
+
+      p {
+        font-size: 12px;
+      }
+    }
+
+    &__refresh {
+      width: 38px;
+      height: 38px;
+      margin-top: 0;
+      padding: 0;
+      border-radius: $radius-sm;
+
+      > span {
+        display: none;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &__section {
+      padding: 28px 0;
+    }
+
+    &__section-header {
+      margin-bottom: 21px;
+
+      h2 {
+        font-size: 17px;
+      }
+    }
+
+    // Empty
+
+    &__empty {
+      min-height: 380px;
+      padding-right: 10px;
+      padding-left: 10px;
+
+      > strong {
+        font-size: 16px;
+      }
+
+      > p {
+        font-size: 12px;
+      }
+    }
+
+    // Connect
+
+    &__connect {
+      padding-top: 27px;
+    }
+
+    &__connect-form {
+      max-width: none;
+    }
+
+    &__type-options {
+      grid-template-columns: 1fr;
+    }
+
+    &__form-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      button {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    // Asset
+
+    &__asset-main {
+      > strong {
+        font-size: 26px;
+      }
+    }
+
+    &__asset-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px 16px;
+    }
+
+    &__asset-value {
+      > strong {
+        font-size: 14px;
+      }
+    }
+
+    // Holdings mobile rows
+
+    &__holding-head {
+      display: none;
+    }
+
+    &__holding-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px 16px;
+      min-height: 94px;
+      padding: 15px 28px 15px 0;
+
+      > span {
+        display: block !important;
+
+        &:nth-child(2),
+        &:nth-child(3),
+        &:nth-child(4) {
+          display: none !important;
+        }
+
+        &:nth-child(5) {
+          grid-column: 1;
+          grid-row: 2;
+          color: $color-gray-500;
+          font-size: 11px;
+          text-align: left;
+
+          &::before {
+            content: '평가 ';
+          }
+        }
+
+        &:nth-child(6) {
+          grid-column: 2;
+          grid-row: 1 / span 2;
+          align-self: center;
+          text-align: right;
+
+          strong {
+            font-size: 13px;
+          }
+
+          small {
+            margin-top: 5px;
+            font-size: 11px;
+          }
+        }
+      }
+
+      &:hover {
+        background: transparent;
+      }
+    }
+
+    &__holding-stock {
+      grid-column: 1;
+      grid-row: 1;
+
+      strong {
+        font-size: 14px;
+      }
+    }
+
+    &__holding-arrow {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      display: block;
+      color: $color-gray-300;
+      transform: translateY(-50%);
+    }
+
+    // Connected account
+
+    &__connection-row {
+      min-height: 68px;
+    }
+
+    &__disconnect {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+
+      > button {
+        width: 100%;
+        height: 40px;
+      }
+    }
+  }
+}
+
+@keyframes account-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

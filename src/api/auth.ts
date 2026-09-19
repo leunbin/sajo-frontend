@@ -40,3 +40,9 @@ export const refresh = async (request: RefreshRequest): Promise<LoginResponse> =
 export const logout = async (): Promise<void> => {
   await apiClient.post('/api/v1/auth/logout');
 };
+
+export const getMe = async (): Promise<UserResponse> => {
+  const response = await apiClient.get<ApiResponse<UserResponse>>('/api/v1/users/me');
+
+  return response.data.data;
+};
