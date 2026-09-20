@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ArrowLeft, CheckCircle2, LoaderCircle } from 'lucide-react';
+import { CheckCircle2, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -15,7 +15,6 @@ const POLLING_INTERVAL = 1500;
 
 function BacktestPage() {
   const navigate = useNavigate();
-
   const { strategyId } = useParams<{
     strategyId: string;
   }>();
@@ -196,15 +195,6 @@ function BacktestPage() {
 
   return (
     <section className="backtest-page">
-      <button
-        type="button"
-        className="backtest-page__back"
-        onClick={() => navigate(`/strategies/${strategyId}`)}
-      >
-        <ArrowLeft size={18} />
-        전략 상세
-      </button>
-
       <header className="backtest-page__header">
         <div>
           <h1>백테스트</h1>

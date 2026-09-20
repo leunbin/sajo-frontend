@@ -6,23 +6,6 @@
   max-width: 960px;
   margin: 0 auto;
 
-  &__back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: $color-gray-500;
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
-
-    &:hover {
-      color: $color-gray-900;
-    }
-  }
-
   &__header {
     margin-top: 26px;
     padding-bottom: 32px;

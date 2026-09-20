@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AlertCircle, ArrowLeft, Check, ChevronRight, LoaderCircle } from 'lucide-react';
+import { AlertCircle, Check, ChevronRight, LoaderCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -600,14 +600,6 @@ function StrategyDetailPage() {
   if (pageError || !strategy) {
     return (
       <main className="strategy-detail">
-        <button
-          type="button"
-          className="strategy-detail__back"
-          onClick={() => navigate('/strategies')}
-        >
-          <ArrowLeft size={18} />내 전략
-        </button>
-
         <div className="strategy-detail__state">
           <AlertCircle size={22} />
           <span>{pageError || '전략을 찾을 수 없습니다.'}</span>
@@ -626,14 +618,6 @@ function StrategyDetailPage() {
 
   return (
     <main className="strategy-detail">
-      <button
-        type="button"
-        className="strategy-detail__back"
-        onClick={() => navigate('/strategies')}
-      >
-        <ArrowLeft size={18} />내 전략
-      </button>
-
       <header className="strategy-detail__header">
         <div>
           <h1>{strategy.strategyName}</h1>
