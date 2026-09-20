@@ -22,6 +22,17 @@
     }
   }
 
+  &__search-sticky {
+    position: sticky;
+    z-index: 30;
+    top: 68px;
+
+    padding: 12px 0;
+    margin: -12px 0;
+
+    background: $color-background;
+  }
+
   &__search {
     display: flex;
     align-items: center;
@@ -201,6 +212,12 @@
   }
 
   @include mobile {
+    &__search-sticky {
+      top: $mobile-header-height;
+      padding: 10px 0;
+      margin: -10px 0;
+    }
+
     &__header {
       margin-bottom: 24px;
 
