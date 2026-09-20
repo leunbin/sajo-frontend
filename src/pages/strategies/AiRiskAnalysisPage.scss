@@ -3,9 +3,6 @@
 
 .ai-risk-page {
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 40px 24px 80px;
 
   &__header {
     display: flex;
@@ -428,8 +425,6 @@
 
 @include mobile {
   .ai-risk-page {
-    padding: 24px 20px 96px;
-
     &__header {
       padding-bottom: 22px;
 
