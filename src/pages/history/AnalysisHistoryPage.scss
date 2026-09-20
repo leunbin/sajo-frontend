@@ -3,12 +3,9 @@
 
 .analysis-history {
   min-height: 100%;
-  padding: 48px 24px 80px;
 
   &__container {
     width: 100%;
-    max-width: 960px;
-    margin: 0 auto;
   }
 
   &__header {
@@ -280,8 +277,6 @@
   }
 
   @include mobile {
-    padding: 28px 20px 96px;
-
     &__header {
       margin-bottom: 28px;
 
