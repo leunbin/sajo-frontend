@@ -111,8 +111,8 @@ function DesktopHeader() {
   return (
     <header className="desktop-header">
       <div className="desktop-header__inner">
-        <NavLink to="/" className="desktop-header__brand">
-          4JO
+        <NavLink to="/" className="desktop-header__brand" aria-label="4JO 홈">
+          <img src="/4jo-logo-green.svg" alt="4JO" />
         </NavLink>
 
         <nav ref={navigationRef} className="desktop-header__navigation">

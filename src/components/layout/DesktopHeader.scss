@@ -25,12 +25,17 @@
   // ─────────────────────────────────────
 
   &__brand {
+    display: flex;
     flex-shrink: 0;
-    color: $color-navy-900;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.6px;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
+
+    img {
+      display: block;
+      width: 66px;
+      height: auto;
+    }
   }
 
   // ─────────────────────────────────────
@@ -42,7 +47,7 @@
     display: flex;
     align-items: stretch;
     align-self: stretch;
-    gap: 32px;
+    gap: 48px;
     margin-left: 56px;
   }
 
