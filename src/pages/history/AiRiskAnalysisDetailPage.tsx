@@ -1,6 +1,6 @@
-import { AlertCircle, ArrowLeft, CheckCircle2, LoaderCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { getAiRiskAnalysis } from '../../api/aiRisk';
 import type { AiRiskAnalysisDetail, RiskFactorType, RiskLevel } from '../../types/aiRisk';
@@ -8,7 +8,6 @@ import type { AiRiskAnalysisDetail, RiskFactorType, RiskLevel } from '../../type
 import '../strategies/AiRiskAnalysisPage.scss';
 
 function AiRiskAnalysisDetailPage() {
-  const navigate = useNavigate();
   const { analysisId } = useParams<{ analysisId: string }>();
 
   const [analysis, setAnalysis] = useState<AiRiskAnalysisDetail | null>(null);
@@ -57,15 +56,6 @@ function AiRiskAnalysisDetailPage() {
     return (
       <main className="ai-risk-page">
         <div className="ai-risk-page__container">
-          <button
-            type="button"
-            className="ai-risk-page__back"
-            onClick={() => navigate('/analysis-history')}
-          >
-            <ArrowLeft size={18} strokeWidth={1.8} />
-            분석 이력
-          </button>
-
           <div className="ai-risk-page__error">
             <AlertCircle size={24} strokeWidth={1.8} />
 
@@ -96,15 +86,6 @@ function AiRiskAnalysisDetailPage() {
     return (
       <main className="ai-risk-page">
         <div className="ai-risk-page__container">
-          <button
-            type="button"
-            className="ai-risk-page__back"
-            onClick={() => navigate('/analysis-history')}
-          >
-            <ArrowLeft size={18} strokeWidth={1.8} />
-            분석 이력
-          </button>
-
           <div className="ai-risk-page__error">
             <AlertCircle size={24} strokeWidth={1.8} />
 
@@ -121,15 +102,6 @@ function AiRiskAnalysisDetailPage() {
   return (
     <main className="ai-risk-page">
       <div className="ai-risk-page__container">
-        <button
-          type="button"
-          className="ai-risk-page__back"
-          onClick={() => navigate('/analysis-history')}
-        >
-          <ArrowLeft size={18} strokeWidth={1.8} />
-          분석 이력
-        </button>
-
         <header className="ai-risk-page__header">
           <div>
             <h1>AI 위험 분석 결과</h1>
