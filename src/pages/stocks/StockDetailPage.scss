@@ -6,22 +6,7 @@
   max-width: 960px;
   margin: 0 auto;
 
-  &__back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: $color-gray-500;
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
   &__header {
-    margin-top: 32px;
-
     h1 {
       margin: 0;
       color: $color-gray-900;
@@ -119,7 +104,6 @@
     }
   }
 
-  // Chart period
   &__periods {
     display: flex;
     align-items: center;
@@ -151,7 +135,6 @@
     }
   }
 
-  // Candlestick chart
   &__chart {
     width: 100%;
     height: 300px;
@@ -171,7 +154,6 @@
     }
   }
 
-  // Candlestick tooltip
   &__candle-tooltip {
     min-width: 150px;
     padding: 12px 14px;
@@ -254,16 +236,80 @@
     }
   }
 
+  &__account-required {
+    display: flex;
+    max-width: 620px;
+    align-items: flex-start;
+    gap: 18px;
+    margin: 72px auto 0;
+    padding: 28px 0;
+    border-top: 1px solid $color-gray-200;
+    border-bottom: 1px solid $color-gray-200;
+  }
+
+  &__account-icon {
+    display: flex;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: $color-gray-100;
+    color: $color-primary;
+  }
+
+  &__account-content {
+    flex: 1;
+
+    h1 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    button {
+      height: 42px;
+      margin-top: 20px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: $radius-sm;
+      background: $color-primary;
+      color: $color-white;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background: $color-primary-hover;
+      }
+    }
+  }
+
   &__state {
     padding: 80px 0;
     color: $color-gray-500;
+    font-size: 14px;
     text-align: center;
+
+    &--error {
+      color: $color-rise;
+    }
   }
 
   @include mobile {
     &__header {
-      margin-top: 24px;
-
       h1 {
         font-size: 26px;
       }
@@ -307,6 +353,32 @@
     &__strategy {
       align-items: stretch;
       flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    &__account-required {
+      gap: 14px;
+      margin-top: 40px;
+      padding: 24px 0;
+    }
+
+    &__account-icon {
+      width: 38px;
+      height: 38px;
+      flex-basis: 38px;
+    }
+
+    &__account-content {
+      h1 {
+        font-size: 18px;
+      }
+
+      p {
+        font-size: 13px;
+      }
 
       button {
         width: 100%;

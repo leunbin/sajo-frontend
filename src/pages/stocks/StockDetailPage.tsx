@@ -1,9 +1,10 @@
 import axios from 'axios';
-import { ArrowLeft } from 'lucide-react';
+import { Link2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { getMyAccount } from '../../api/account';
 import { getStockChart, getStockSummary } from '../../api/market';
 import type { StockPrice, StockSummary } from '../../types/market';
 import './StockDetailPage.scss';
@@ -57,11 +58,8 @@ function CandleShape({ x = 0, y = 0, width = 0, height = 0, payload }: CandleSha
   }
 
   const { openPrice, highPrice, lowPrice, closePrice } = payload;
-
   const priceRange = highPrice - lowPrice;
-
   const centerX = x + width / 2;
-
   const candleWidth = Math.max(Math.min(width * 0.55, 14), 3);
 
   const color = closePrice > openPrice ? '#e5484d' : closePrice < openPrice ? '#3182f6' : '#6b7280';
@@ -81,11 +79,6 @@ function CandleShape({ x = 0, y = 0, width = 0, height = 0, payload }: CandleSha
     );
   }
 
-  /*
-   * Bar의 dataKey가 [lowPrice, highPrice]이므로
-   * Recharts가 전달하는 y ~ y + height가
-   * 해당 거래일의 고가 ~ 저가 영역이다.
-   */
   const priceToY = (price: number) => y + ((highPrice - price) / priceRange) * height;
 
   const highY = y;
@@ -95,8 +88,6 @@ function CandleShape({ x = 0, y = 0, width = 0, height = 0, payload }: CandleSha
 
   const bodyX = centerX - candleWidth / 2;
   const bodyY = Math.min(openY, closeY);
-
-  // 시가 === 종가인 경우에도 봉이 보이도록 최소 높이 보장
   const bodyHeight = Math.max(Math.abs(closeY - openY), 2);
 
   return (
@@ -149,16 +140,13 @@ function StockDetailPage() {
   const { stockCode } = useParams<{ stockCode: string }>();
 
   const [summary, setSummary] = useState<StockSummary | null>(null);
-
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isAccountConnected, setIsAccountConnected] = useState<boolean | null>(null);
 
   const [chartDays, setChartDays] = useState<ChartDays>(30);
-
   const [chartData, setChartData] = useState<StockPrice[]>([]);
-
   const [isChartLoading, setIsChartLoading] = useState(true);
-
   const [chartError, setChartError] = useState('');
 
   useEffect(() => {
@@ -177,8 +165,21 @@ function StockDetailPage() {
 
     let ignore = false;
 
-    const fetchSummary = async () => {
+    const fetchStockDetail = async () => {
       try {
+        const account = await getMyAccount();
+
+        if (ignore) {
+          return;
+        }
+
+        if (!account) {
+          setIsAccountConnected(false);
+          return;
+        }
+
+        setIsAccountConnected(true);
+
         const response = await getStockSummary(stockCode);
 
         if (!ignore) {
@@ -201,7 +202,7 @@ function StockDetailPage() {
       }
     };
 
-    void fetchSummary();
+    void fetchStockDetail();
 
     return () => {
       ignore = true;
@@ -209,7 +210,7 @@ function StockDetailPage() {
   }, [stockCode]);
 
   useEffect(() => {
-    if (!stockCode) {
+    if (!stockCode || !isAccountConnected) {
       return;
     }
 
@@ -242,7 +243,7 @@ function StockDetailPage() {
     return () => {
       ignore = true;
     };
-  }, [stockCode, chartDays]);
+  }, [stockCode, chartDays, isAccountConnected]);
 
   const sortedChartData = useMemo(
     () =>
@@ -267,13 +268,20 @@ function StockDetailPage() {
     }
 
     const lowestPrice = Math.min(...sortedChartData.map((price) => price.lowPrice));
-
     const highestPrice = Math.max(...sortedChartData.map((price) => price.highPrice));
 
     const padding = Math.max((highestPrice - lowestPrice) * 0.08, 1);
 
     return [Math.floor(lowestPrice - padding), Math.ceil(highestPrice + padding)];
   }, [sortedChartData]);
+
+  if (!stockCode) {
+    return (
+      <section className="stock-detail">
+        <div className="stock-detail__state">종목 정보를 찾을 수 없습니다.</div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -283,15 +291,40 @@ function StockDetailPage() {
     );
   }
 
-  if (errorMessage || !summary) {
+  if (errorMessage) {
     return (
       <section className="stock-detail">
-        <button type="button" className="stock-detail__back" onClick={() => navigate('/stocks')}>
-          <ArrowLeft size={18} />
-          종목 탐색
-        </button>
+        <div className="stock-detail__state stock-detail__state--error">{errorMessage}</div>
+      </section>
+    );
+  }
 
-        <div className="stock-detail__state">{errorMessage || '종목 정보를 찾을 수 없습니다.'}</div>
+  if (isAccountConnected === false) {
+    return (
+      <section className="stock-detail">
+        <div className="stock-detail__account-required">
+          <div className="stock-detail__account-icon" aria-hidden="true">
+            <Link2 size={22} />
+          </div>
+
+          <div className="stock-detail__account-content">
+            <h1>계좌 연결이 필요합니다</h1>
+
+            <p>한국투자증권 계좌를 연결하면 현재 시세와 투자 정보를 확인할 수 있습니다.</p>
+
+            <button type="button" onClick={() => navigate('/account')}>
+              계좌 연결하기
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!summary) {
+    return (
+      <section className="stock-detail">
+        <div className="stock-detail__state">종목 정보를 찾을 수 없습니다.</div>
       </section>
     );
   }
@@ -300,11 +333,6 @@ function StockDetailPage() {
 
   return (
     <section className="stock-detail">
-      <button type="button" className="stock-detail__back" onClick={() => navigate('/stocks')}>
-        <ArrowLeft size={18} />
-        종목 탐색
-      </button>
-
       <header className="stock-detail__header">
         <div>
           <h1>{stock.stockName}</h1>
@@ -322,7 +350,6 @@ function StockDetailPage() {
 
         <div className={getChangeClassName(quote.changePrice)}>
           <span>{formatChangePrice(quote.changePrice)}</span>
-
           <span>{formatChangeRate(quote.changeRate)}</span>
         </div>
       </section>

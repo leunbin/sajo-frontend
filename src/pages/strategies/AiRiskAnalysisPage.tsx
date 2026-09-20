@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { AlertTriangle, ArrowLeft, CheckCircle2, LoaderCircle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, LoaderCircle, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { createAiRiskAnalysis, getAiRiskAnalysis } from '../../api/aiRisk';
 import { getBacktestDetail } from '../../api/backtest';
@@ -16,8 +16,6 @@ import './AiRiskAnalysisPage.scss';
 const POLLING_INTERVAL = 1500;
 
 function AiRiskAnalysisPage() {
-  const navigate = useNavigate();
-
   const { strategyId, backtestId } = useParams<{
     strategyId: string;
     backtestId: string;
@@ -196,15 +194,6 @@ function AiRiskAnalysisPage() {
 
   return (
     <section className="ai-risk-page">
-      <button
-        type="button"
-        className="ai-risk-page__back"
-        onClick={() => navigate(`/strategies/${strategyId}/backtest`)}
-      >
-        <ArrowLeft size={18} />
-        백테스트 결과
-      </button>
-
       <header className="ai-risk-page__header">
         <div>
           <h1>전략 위험 분석</h1>

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ArrowLeft } from 'lucide-react';
 import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -248,11 +247,6 @@ function StrategyCreatePage() {
   if (stockError || !stock) {
     return (
       <section className="strategy-create">
-        <button type="button" className="strategy-create__back" onClick={() => navigate('/stocks')}>
-          <ArrowLeft size={18} />
-          종목 탐색
-        </button>
-
         <div className="strategy-create__state">
           {stockError || '종목 정보를 찾을 수 없습니다.'}
         </div>
@@ -262,15 +256,6 @@ function StrategyCreatePage() {
 
   return (
     <section className="strategy-create">
-      <button
-        type="button"
-        className="strategy-create__back"
-        onClick={() => navigate(`/stocks/${stock.stockCode}`)}
-      >
-        <ArrowLeft size={18} />
-        종목 상세
-      </button>
-
       <header className="strategy-create__header">
         <span>전략 만들기</span>
         <h1>{stock.stockName}</h1>
