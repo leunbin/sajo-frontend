@@ -13,7 +13,7 @@
   &__inner {
     display: flex;
     width: 100%;
-    max-width: $content-max-width;
+    max-width: $header-max-width;
     height: 100%;
     align-items: center;
     margin: 0 auto;
@@ -48,7 +48,7 @@
     align-items: stretch;
     align-self: stretch;
     gap: 48px;
-    margin-left: 56px;
+    margin-left: 48px;
   }
 
   &__link {
