@@ -1,9 +1,12 @@
+import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 import { login, signup } from '../../api/auth';
+import AuthShowcase from '../../components/auth/AuthShowcase';
 import { tokenStorage } from '../../utils/tokenStorage';
+
 import './SignupPage.scss';
 
 function SignupPage() {
@@ -67,7 +70,6 @@ function SignupPage() {
 
     const trimmedEmail = email.trim();
 
-    // 1. 회원가입
     try {
       await signup({
         name: name.trim(),
@@ -85,7 +87,6 @@ function SignupPage() {
       return;
     }
 
-    // 2. 회원가입 성공 후 자동 로그인
     try {
       const loginResponse = await login({
         email: trimmedEmail,
@@ -96,7 +97,6 @@ function SignupPage() {
 
       navigate('/', { replace: true });
     } catch {
-      // 계정 생성 자체는 성공했으므로 로그인 화면으로 이동
       navigate('/login', {
         replace: true,
         state: {
@@ -113,19 +113,25 @@ function SignupPage() {
       <section className="signup-page__content">
         <section className="signup-page__brand">
           <div className="signup-page__brand-content">
-            <img src="/4jo-logo.svg" alt="4JO" className="signup-page__logo" />
+            <div className="signup-page__hero">
+              <div className="signup-page__brand-copy">
+                <h1>
+                  나만의 투자 전략을
+                  <br />
+                  시작해보세요.
+                </h1>
 
-            <h1>
-              나만의 투자 전략을
-              <br />
-              시작해보세요.
-            </h1>
+                <p>
+                  전략을 만들고 백테스트한 후
+                  <br />
+                  위험을 확인하고 자동매매까지 관리할 수 있습니다.
+                </p>
+              </div>
 
-            <p>
-              전략을 만들고 백테스트한 후
-              <br />
-              위험을 확인하고 자동매매까지 관리할 수 있습니다.
-            </p>
+              <div className="signup-page__showcase">
+                <AuthShowcase />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -138,6 +144,7 @@ function SignupPage() {
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="signup-form__field">
               <label htmlFor="name">이름</label>
+
               <input
                 id="name"
                 type="text"
@@ -150,6 +157,7 @@ function SignupPage() {
 
             <div className="signup-form__field">
               <label htmlFor="email">이메일</label>
+
               <input
                 id="email"
                 type="email"

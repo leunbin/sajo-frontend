@@ -1,9 +1,12 @@
+import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 import { getMe, login } from '../../api/auth';
+import AuthShowcase from '../../components/auth/AuthShowcase';
 import { tokenStorage } from '../../utils/tokenStorage';
+
 import './LoginPage.scss';
 
 function LoginPage() {
@@ -58,18 +61,24 @@ function LoginPage() {
       <section className="login-page__content">
         <section className="login-page__brand">
           <div className="login-page__brand-content">
-            <img src="/4jo-logo.svg" alt="4JO" className="login-page__logo" />
+            <div className="login-page__hero">
+              <div className="login-page__brand-copy">
+                <h1>
+                  내 전략을 확인하고,
+                  <br />더 신중하게 투자하세요.
+                </h1>
 
-            <h1>
-              내 전략을 확인하고,
-              <br />더 신중하게 투자하세요.
-            </h1>
+                <p>
+                  백테스트부터 위험 분석, 자동매매까지
+                  <br />
+                  하나의 흐름으로 관리할 수 있습니다.
+                </p>
+              </div>
 
-            <p>
-              백테스트부터 위험 분석, 자동매매까지
-              <br />
-              하나의 흐름으로 관리할 수 있습니다.
-            </p>
+              <div className="login-page__showcase">
+                <AuthShowcase />
+              </div>
+            </div>
           </div>
         </section>
 

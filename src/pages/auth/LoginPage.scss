@@ -12,49 +12,142 @@
     grid-template-columns: minmax(560px, 1fr) minmax(480px, 42%);
   }
 
+  // =========================================================
+  // Brand
+  // =========================================================
+
+  // =========================================================
   // 왼쪽 브랜드 영역
+  // =========================================================
+
   &__brand {
+    position: relative;
     display: flex;
+    overflow: hidden;
     align-items: center;
     justify-content: center;
-    padding: 80px 56px;
     background: $color-navy-900;
   }
 
   &__brand-content {
     position: relative;
     width: 100%;
-    max-width: 560px;
-
-    h1 {
-      margin: 0;
-      color: $color-white;
-      font-size: 40px;
-      font-weight: 700;
-      line-height: 1.3;
-      letter-spacing: -1.4px;
-      word-break: keep-all;
-    }
-
-    p {
-      margin: 24px 0 0;
-      color: $color-gray-400;
-      font-size: 16px;
-      line-height: 1.7;
-      word-break: keep-all;
-    }
+    height: 100vh;
+    min-height: 720px;
+    max-width: 900px;
   }
 
+  // 로고
   &__logo {
     position: absolute;
-    bottom: calc(100% + 48px);
-    left: 0;
-    display: block;
-    width: 128px;
+    z-index: 20;
+    top: 56px;
+    left: 56px;
+
+    width: 88px;
     height: auto;
   }
 
-  // 오른쪽 로그인 영역
+  // =========================================================
+  // Hero
+  //
+  //       COPY      PHONE PHONE
+  //       COPY ───────╯
+  // =========================================================
+
+  &__hero {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    display: flex;
+    width: calc(100% - 112px);
+    max-width: 820px;
+    align-items: center;
+    justify-content: center;
+
+    transform: translate(-50%, -50%);
+  }
+
+  // =========================================================
+  // 카피
+  // =========================================================
+
+  &__brand-copy {
+    position: relative;
+
+    // 반드시 폰보다 위
+    z-index: 10;
+
+    width: 450px;
+    flex: 0 0 450px;
+
+    // 폰 쪽으로 밀어서 살짝 겹침
+    margin-right: -105px;
+
+    h1 {
+      margin: 0;
+
+      color: $color-white;
+
+      font-size: 39px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -1.4px;
+
+      white-space: nowrap;
+
+      // 폰 위에 겹치는 부분 가독성
+      text-shadow:
+        0 2px 8px rgba(17, 24, 39, 0.45),
+        0 6px 24px rgba(17, 24, 39, 0.3);
+    }
+
+    p {
+      margin: 26px 0 0;
+
+      color: $color-gray-300;
+
+      font-size: 15px;
+      line-height: 1.75;
+
+      white-space: nowrap;
+    }
+  }
+
+  // =========================================================
+  // 두 대의 휴대폰
+  // =========================================================
+
+  &__showcase {
+    position: relative;
+    z-index: 2;
+
+    width: 430px;
+    height: 590px;
+    flex: 0 0 430px;
+
+    // 전체 휴대폰 묶음을 약간 오른쪽으로
+    transform: translateX(24px);
+
+    .auth-showcase {
+      position: absolute;
+
+      top: 50%;
+      right: auto;
+      left: 50%;
+
+      // AuthShowcase 원본보다 약 3/4 크기
+      transform: translate(-50%, -50%) scale(0.76);
+
+      transform-origin: center center;
+    }
+  }
+
+  // =========================================================
+  // Login area
+  // =========================================================
+
   &__form-area {
     width: min(400px, calc(100% - 64px));
     margin: auto;
@@ -65,7 +158,9 @@
 
     h2 {
       margin: 0;
+
       color: $color-gray-900;
+
       font-size: 30px;
       line-height: 1.3;
       letter-spacing: -0.7px;
@@ -73,7 +168,9 @@
 
     p {
       margin: 8px 0 0;
+
       color: $color-gray-500;
+
       font-size: 15px;
     }
   }
@@ -81,9 +178,12 @@
   &__signup {
     display: flex;
     justify-content: center;
+
     gap: 7px;
     margin-top: 24px;
+
     color: $color-gray-500;
+
     font-size: 14px;
 
     a {
@@ -97,18 +197,25 @@
   }
 }
 
+// =========================================================
+// Login form
+// =========================================================
+
 .login-form {
   display: flex;
   flex-direction: column;
+
   gap: 20px;
 
   &__field {
     display: flex;
     flex-direction: column;
+
     gap: 8px;
 
     label {
       color: $color-gray-700;
+
       font-size: 14px;
       font-weight: 600;
     }
@@ -116,13 +223,19 @@
     input {
       width: 100%;
       height: 50px;
+
       padding: 0 15px;
+
       border: 1px solid $color-gray-300;
       border-radius: $radius-sm;
+
       outline: none;
+
       background: $color-white;
       color: $color-gray-900;
+
       font-size: 15px;
+
       transition:
         border-color 0.15s ease,
         box-shadow 0.15s ease;
@@ -133,6 +246,7 @@
 
       &:focus {
         border-color: $color-primary;
+
         box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
       }
     }
@@ -149,10 +263,13 @@
       position: absolute;
       top: 50%;
       right: 14px;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       transform: translateY(-50%);
+
       color: $color-gray-400;
 
       &:hover {
@@ -163,19 +280,26 @@
 
   &__error {
     margin-top: -6px;
+
     color: $color-risk-high;
+
     font-size: 13px;
     line-height: 1.5;
   }
 
   &__submit {
     height: 52px;
+
     margin-top: 4px;
+
     border-radius: $radius-sm;
+
     background: $color-primary;
     color: $color-white;
+
     font-size: 15px;
     font-weight: 700;
+
     transition: background 0.15s ease;
 
     &:hover:not(:disabled) {
@@ -189,18 +313,38 @@
   }
 }
 
+// =========================================================
+// Tablet
+// =========================================================
+
 @include tablet {
   .login-page {
     &__content {
       grid-template-columns: minmax(0, 1fr) 400px;
     }
 
-    &__brand {
-      padding: 64px 40px;
+    &__brand-content {
+      min-height: 680px;
     }
 
-    &__brand-content {
-      max-width: 440px;
+    &__logo {
+      top: 44px;
+      left: 40px;
+      width: 82px;
+    }
+
+    &__showcase {
+      top: 43%;
+      left: 48%;
+
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+
+    &__brand-copy {
+      bottom: 60px;
+      left: 40px;
+
+      width: calc(100% - 80px);
 
       h1 {
         font-size: 32px;
@@ -209,58 +353,75 @@
       }
 
       p {
-        margin-top: 20px;
+        margin-top: 18px;
+
         font-size: 14px;
       }
-    }
-
-    &__logo {
-      bottom: calc(100% + 40px);
-      width: 112px;
     }
   }
 }
 
+// =========================================================
+// Mobile
+// =========================================================
+
 @include mobile {
   .login-page {
     min-height: 100dvh;
+
     background: $color-navy-900;
 
     &__content {
       display: flex;
+
       width: 100%;
       min-height: 100dvh;
+
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       padding: 40px 24px;
+
       background: $color-navy-900;
     }
 
     &__brand {
       display: flex;
       flex: none;
+
+      overflow: visible;
+
       align-items: center;
       justify-content: center;
-      padding: 0;
+
       background: transparent;
     }
 
     &__brand-content {
       display: flex;
+
       width: auto;
-      max-width: none;
+      height: auto;
+      min-height: 0;
+
       align-items: center;
       justify-content: center;
+    }
 
-      h1,
-      p {
-        display: none;
-      }
+    // 모바일에서는 제품 광고 숨김
+    &__showcase {
+      display: none;
+    }
+
+    // 모바일에서는 카피 숨김
+    &__brand-copy {
+      display: none;
     }
 
     &__logo {
       position: static;
+
       width: 132px;
       height: auto;
     }
@@ -268,29 +429,35 @@
     &__form-area {
       width: 100%;
       max-width: 400px;
+
       margin: 40px 0 0;
       padding: 0;
     }
 
     &__heading {
       margin-bottom: 32px;
+
       text-align: center;
 
       h2 {
         color: $color-white;
+
         font-size: 28px;
         line-height: 1.3;
       }
 
       p {
         margin-top: 8px;
+
         color: $color-gray-400;
+
         font-size: 15px;
       }
     }
 
     &__signup {
       margin-top: 24px;
+
       color: $color-gray-400;
 
       a {
@@ -307,6 +474,7 @@
 
       input {
         border-color: $color-gray-700;
+
         background: $color-navy-800;
         color: $color-white;
 
@@ -316,6 +484,7 @@
 
         &:focus {
           border-color: $color-primary;
+
           box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
         }
       }

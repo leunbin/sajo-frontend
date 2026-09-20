@@ -1,0 +1,179 @@
+@use '../../../styles/abstracts/variables' as *;
+
+.sliding-tabs {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  &__tab {
+    position: relative;
+    z-index: 2;
+
+    border: 0;
+    background: transparent;
+
+    color: $color-gray-500;
+
+    font: inherit;
+    cursor: pointer;
+
+    transition: color 180ms ease;
+
+    &:hover {
+      color: $color-gray-900;
+    }
+
+    &--active {
+      color: $color-gray-900;
+    }
+  }
+
+  &__indicator {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+      width 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+
+    &--ready {
+      opacity: 1;
+    }
+  }
+
+  // =========================================================
+  // Underline
+  // =========================================================
+
+  &--underline {
+    gap: 28px;
+
+    // border-bottom: 1px solid $color-gray-200;
+
+    .sliding-tabs__tab {
+      padding: 0 2px 15px;
+
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .sliding-tabs__indicator {
+      bottom: -1px;
+
+      height: 2px;
+
+      background: $color-primary;
+    }
+  }
+
+  // =========================================================
+  // Pill 공통
+  // =========================================================
+
+  &--pill {
+    background: $color-gray-50;
+
+    .sliding-tabs__indicator {
+      background: $color-white;
+
+      border: 1px solid $color-primary-line;
+
+      box-shadow: 0 2px 8px rgb(17 24 39 / 5%);
+    }
+
+    .sliding-tabs__tab--active {
+      color: $color-primary;
+    }
+  }
+
+  // =========================================================
+  // Small Pill
+  // 전체 / 매수 / 매도
+  // =========================================================
+
+  &--pill#{&}--sm {
+    gap: 6px;
+
+    padding: 4px;
+
+    border-radius: $radius-md;
+
+    .sliding-tabs__tab {
+      min-width: 58px;
+      height: 34px;
+
+      padding: 0 14px;
+
+      border-radius: $radius-sm;
+
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sliding-tabs__indicator {
+      top: 4px;
+      bottom: 4px;
+
+      border-radius: $radius-sm;
+    }
+  }
+
+  // =========================================================
+  // Large Pill
+  // 주문 / 체결 메인 navigation
+  // =========================================================
+
+  &--pill#{&}--lg {
+    display: flex;
+
+    width: 100%;
+    max-width: 360px;
+
+    gap: 0;
+    padding: 5px;
+
+    border-radius: 14px;
+
+    background: $color-gray-50;
+
+    .sliding-tabs__tab {
+      flex: 1;
+
+      height: 48px;
+
+      padding: 0 24px;
+
+      border-radius: 10px;
+
+      font-size: 16px;
+      font-weight: 600;
+
+      letter-spacing: -0.2px;
+    }
+
+    .sliding-tabs__indicator {
+      top: 5px;
+      bottom: 5px;
+
+      border-radius: 10px;
+
+      background: $color-white;
+
+      border: 1px solid $color-primary-line;
+
+      box-shadow:
+        0 1px 2px rgb(17 24 39 / 4%),
+        0 4px 12px rgb(17 24 39 / 4%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sliding-tabs__indicator {
+    transition: none;
+  }
+}

@@ -3,12 +3,27 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { getAiRiskAnalysisHistory } from '../../api/aiRisk';
+import SlidingTabs from '../../components/common/SlidingTabs/SlidingTabs';
 import type { AiRiskAnalysisHistoryItem } from '../../types/aiRisk';
 import './AnalysisHistoryPage.scss';
 
 const PAGE_SIZE = 10;
 
 type HistoryTab = 'BACKTEST' | 'AI';
+
+const HISTORY_TABS: Array<{
+  value: HistoryTab;
+  label: string;
+}> = [
+  {
+    value: 'BACKTEST',
+    label: '백테스트',
+  },
+  {
+    value: 'AI',
+    label: 'AI 위험 분석',
+  },
+];
 
 const formatDate = (value: string) => {
   return new Intl.DateTimeFormat('ko-KR', {
@@ -113,30 +128,15 @@ function AnalysisHistoryPage() {
           <p>전략을 검증하기 위해 실행한 백테스트와 AI 위험 분석 결과를 확인할 수 있습니다.</p>
         </header>
 
-        <div className="analysis-history__tabs" role="tablist">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'BACKTEST'}
-            className={`analysis-history__tab ${
-              activeTab === 'BACKTEST' ? 'analysis-history__tab--active' : ''
-            }`}
-            onClick={() => handleTabChange('BACKTEST')}
-          >
-            백테스트
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'AI'}
-            className={`analysis-history__tab ${
-              activeTab === 'AI' ? 'analysis-history__tab--active' : ''
-            }`}
-            onClick={() => handleTabChange('AI')}
-          >
-            AI 위험 분석
-          </button>
+        <div className="analysis-history__tabs">
+          <SlidingTabs<HistoryTab>
+            items={HISTORY_TABS}
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="underline"
+            size="lg"
+            ariaLabel="분석 유형"
+          />
         </div>
 
         {activeTab === 'BACKTEST' ? (

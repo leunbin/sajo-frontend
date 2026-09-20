@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 
 import { getExecutionDetail, getExecutions } from '../../api/execution';
 import { getOrderDetail, getOrders } from '../../api/order';
+import SlidingTabs from '../../components/common/SlidingTabs/SlidingTabs';
 
 import type { Execution } from '../../types/execution';
 import type { OrderDetail, OrderListItem, OrderStatus, OrderType } from '../../types/order';
@@ -279,55 +280,34 @@ function OrdersPage() {
           </button>
         </header>
 
-        <div className="orders-page__view-tabs" role="tablist">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'ORDERS'}
-            className={
-              activeTab === 'ORDERS'
-                ? 'orders-page__view-tab orders-page__view-tab--active'
-                : 'orders-page__view-tab'
-            }
-            onClick={() => handleTabChange('ORDERS')}
-          >
-            주문
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'EXECUTIONS'}
-            className={
-              activeTab === 'EXECUTIONS'
-                ? 'orders-page__view-tab orders-page__view-tab--active'
-                : 'orders-page__view-tab'
-            }
-            onClick={() => handleTabChange('EXECUTIONS')}
-          >
-            체결
-          </button>
+        <div className="orders-page__view-tabs">
+          <SlidingTabs<ViewTab>
+            items={[
+              { value: 'ORDERS', label: '주문' },
+              { value: 'EXECUTIONS', label: '체결' },
+            ]}
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="pill"
+            size="lg"
+            ariaLabel="주문 및 체결"
+          />
         </div>
 
         <section className="orders-page__toolbar">
           {activeTab === 'ORDERS' ? (
-            <div className="orders-page__filters" role="tablist" aria-label="주문 유형">
-              <FilterButton
-                label="전체"
-                active={orderType === 'ALL'}
-                onClick={() => handleFilterChange('ALL')}
-              />
-
-              <FilterButton
-                label="매수"
-                active={orderType === 'BUY'}
-                onClick={() => handleFilterChange('BUY')}
-              />
-
-              <FilterButton
-                label="매도"
-                active={orderType === 'SELL'}
-                onClick={() => handleFilterChange('SELL')}
+            <div className="orders-page__filters">
+              <SlidingTabs<OrderTypeFilter>
+                items={[
+                  { value: 'ALL', label: '전체' },
+                  { value: 'BUY', label: '매수' },
+                  { value: 'SELL', label: '매도' },
+                ]}
+                value={orderType}
+                onChange={handleFilterChange}
+                variant="underline"
+                size="sm"
+                ariaLabel="주문 유형"
               />
             </div>
           ) : (
@@ -946,28 +926,6 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <span>{label}</span>
       <strong title={value}>{value}</strong>
     </div>
-  );
-}
-
-function FilterButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      className={active ? 'orders-page__filter orders-page__filter--active' : 'orders-page__filter'}
-      onClick={onClick}
-    >
-      {label}
-    </button>
   );
 }
 
