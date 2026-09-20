@@ -122,16 +122,18 @@ function StocksPage() {
         <p>국내 주식 종목을 검색하고 정보를 확인하세요.</p>
       </header>
 
-      <div className="stocks-page__search">
-        <Search size={20} aria-hidden="true" />
+      <div className="stocks-page__search-sticky">
+        <div className="stocks-page__search">
+          <Search size={20} aria-hidden="true" />
 
-        <input
-          type="search"
-          value={keyword}
-          onChange={handleKeywordChange}
-          placeholder="종목명 또는 종목코드"
-          aria-label="종목 검색"
-        />
+          <input
+            type="search"
+            value={keyword}
+            onChange={handleKeywordChange}
+            placeholder="종목명 또는 종목코드"
+            aria-label="종목 검색"
+          />
+        </div>
       </div>
 
       <div className="stocks-page__list-header">
