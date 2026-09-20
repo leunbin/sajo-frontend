@@ -1,8 +1,10 @@
 import { ChevronDown, History, LogOut, UserRound } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { handleLogout } from '../../utils/logout';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+
 import { getMe } from '../../api/auth';
+import { handleLogout } from '../../utils/logout';
+
 import './DesktopHeader.scss';
 
 const navigation = [
@@ -12,14 +14,35 @@ const navigation = [
   { label: '주문·체결', path: '/orders' },
 ];
 
+interface IndicatorPosition {
+  width: number;
+  left: number;
+}
+
 function DesktopHeader() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigationRef = useRef<HTMLElement>(null);
+  const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userName, setUserName] = useState('');
+  const [indicator, setIndicator] = useState<IndicatorPosition | null>(null);
+
+  const activePath =
+    navigation.find(({ path }) => {
+      if (path === '/') {
+        return location.pathname === '/';
+      }
+
+      return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    })?.path ?? null;
 
   const onLogout = async () => {
     await handleLogout();
+
     navigate('/login', { replace: true });
   };
 
@@ -27,6 +50,7 @@ function DesktopHeader() {
     const loadUser = async () => {
       try {
         const user = await getMe();
+
         setUserName(user.name);
       } catch {
         setUserName('');
@@ -50,6 +74,40 @@ function DesktopHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    const navigationElement = navigationRef.current;
+
+    if (!navigationElement || !activePath) {
+      setIndicator(null);
+      return;
+    }
+
+    const activeLink = linkRefs.current.get(activePath);
+
+    if (!activeLink) {
+      setIndicator(null);
+      return;
+    }
+
+    const updateIndicator = () => {
+      setIndicator({
+        width: activeLink.offsetWidth,
+        left: activeLink.offsetLeft,
+      });
+    };
+
+    updateIndicator();
+
+    const resizeObserver = new ResizeObserver(updateIndicator);
+
+    resizeObserver.observe(navigationElement);
+    resizeObserver.observe(activeLink);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [activePath]);
+
   return (
     <header className="desktop-header">
       <div className="desktop-header__inner">
@@ -57,19 +115,43 @@ function DesktopHeader() {
           4JO
         </NavLink>
 
-        <nav className="desktop-header__navigation">
-          {navigation.map(({ label, path }) => (
-            <NavLink
-              key={path}
-              to={path}
-              end={path === '/'}
-              className={({ isActive }) =>
-                `desktop-header__link ${isActive ? 'desktop-header__link--active' : ''}`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
+        <nav ref={navigationRef} className="desktop-header__navigation">
+          <span
+            aria-hidden="true"
+            className={`desktop-header__indicator ${
+              indicator ? 'desktop-header__indicator--visible' : ''
+            }`}
+            style={
+              indicator
+                ? {
+                    width: `${indicator.width}px`,
+                    transform: `translateX(${indicator.left}px)`,
+                  }
+                : undefined
+            }
+          />
+
+          {navigation.map(({ label, path }) => {
+            const isActive = activePath === path;
+
+            return (
+              <NavLink
+                key={path}
+                ref={(element) => {
+                  if (element) {
+                    linkRefs.current.set(path, element);
+                  } else {
+                    linkRefs.current.delete(path);
+                  }
+                }}
+                to={path}
+                end={path === '/'}
+                className={`desktop-header__link ${isActive ? 'desktop-header__link--active' : ''}`}
+              >
+                {label}
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="desktop-header__user" ref={menuRef}>
