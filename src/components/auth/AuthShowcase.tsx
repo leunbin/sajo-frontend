@@ -273,7 +273,7 @@ function AuthShowcase() {
         <Phone variant="front" screens={['stock', 'strategy', 'backtest', 'risk']} />
       </div>
 
-      <div className="auth-showcase__progress">
+      {/* <div className="auth-showcase__progress">
         <span>01</span>
 
         <div>
@@ -281,7 +281,7 @@ function AuthShowcase() {
         </div>
 
         <span>04</span>
-      </div>
+      </div> */}
     </div>
   );
 }
