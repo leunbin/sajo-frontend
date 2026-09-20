@@ -2,6 +2,7 @@ import axios from 'axios';
 import { ChevronRight, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SlidingTabs from '../../components/common/SlidingTabs/SlidingTabs';
 
 import { getStrategies } from '../../api/strategy';
 import type { StrategyStatus, StrategySummary } from '../../types/strategy';
@@ -153,19 +154,15 @@ function StrategiesPage() {
       </header>
 
       <div className="strategies-page__toolbar">
-        <div className="strategies-page__filters" role="tablist" aria-label="전략 상태">
-          {FILTERS.map((item) => (
-            <button
-              key={item.value}
-              type="button"
-              role="tab"
-              aria-selected={filter === item.value}
-              className={filter === item.value ? 'is-active' : ''}
-              onClick={() => handleFilterChange(item.value)}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="strategies-page__filters">
+          <SlidingTabs<StrategyFilter>
+            items={FILTERS}
+            value={filter}
+            onChange={handleFilterChange}
+            variant="underline"
+            size="sm"
+            ariaLabel="전략 상태"
+          />
         </div>
 
         {!isLoading && !errorMessage && (
