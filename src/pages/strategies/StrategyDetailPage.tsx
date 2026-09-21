@@ -1,5 +1,17 @@
 import axios from 'axios';
-import { AlertCircle, Check, ChevronRight, LoaderCircle } from 'lucide-react';
+import {
+  Activity,
+  AlertCircle,
+  Check,
+  ChevronRight,
+  LoaderCircle,
+  Play,
+  Power,
+  ReceiptText,
+  RotateCcw,
+  ShieldCheck,
+  Square,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -16,6 +28,7 @@ import {
 } from '../../api/autoTrading';
 import { createBacktest, getBacktestDetail, getBacktests } from '../../api/backtest';
 import { getStrategy, updateStrategyActivation } from '../../api/strategy';
+import Button from '../../components/common/Button/Button';
 import StrategyManagementActions from '../../components/strategy/StrategyManagementActions';
 import {
   completeStrategyRevalidation,
@@ -284,13 +297,6 @@ function StrategyDetailPage() {
           }));
         }
 
-        /*
-         * 전략이 수정된 경우 서버에 남아 있는 기존 백테스트와
-         * AI 분석은 현재 전략의 검증 결과로 사용하지 않는다.
-         *
-         * 기존 데이터 자체는 삭제하지 않기 때문에 분석 이력에서는
-         * 계속 조회할 수 있다.
-         */
         if (validationRequired) {
           const validationState = getStrategyValidationState(strategyId);
 
@@ -472,7 +478,6 @@ function StrategyDetailPage() {
       void pollBacktest(created.backtestId);
     } catch (error) {
       setBacktestError(getErrorMessage(error, '백테스트 실행에 실패했습니다.'));
-
       setIsBacktestSubmitting(false);
     }
   };
@@ -518,7 +523,6 @@ function StrategyDetailPage() {
       void pollAiAnalysis(created.analysisId);
     } catch (error) {
       setAiError(getErrorMessage(error, 'AI 위험 분석 요청에 실패했습니다.'));
-
       setIsAiSubmitting(false);
     }
   };
@@ -691,11 +695,8 @@ function StrategyDetailPage() {
   }
 
   const isBacktestCompleted = latestBacktest?.status === 'COMPLETED';
-
   const isAiCompleted = !requiresRevalidation && aiAnalysis?.status === 'COMPLETED';
-
   const isStrategyActive = strategy.status === 'ACTIVE';
-
   const isAutoTradingEnabled = autoTrading?.enabled === true;
 
   return (
@@ -754,25 +755,21 @@ function StrategyDetailPage() {
 
         <div className="strategy-detail__steps">
           <VerificationStep label="전략 설정" state="complete" />
-
           <VerificationLine />
 
           <VerificationStep label="백테스트" state={isBacktestCompleted ? 'complete' : 'current'} />
-
           <VerificationLine />
 
           <VerificationStep
             label="위험 분석"
             state={isAiCompleted ? 'complete' : isBacktestCompleted ? 'current' : 'pending'}
           />
-
           <VerificationLine />
 
           <VerificationStep
             label="자동매매"
             state={isAutoTradingEnabled ? 'complete' : isAiCompleted ? 'current' : 'pending'}
           />
-
           <VerificationLine />
 
           <VerificationStep
@@ -790,13 +787,14 @@ function StrategyDetailPage() {
           </div>
 
           {latestBacktest && !isBacktestFormOpen && !requiresRevalidation && (
-            <button
+            <Button
               type="button"
-              className="strategy-detail__text-action"
+              variant="ghost"
+              size="sm"
               onClick={() => setIsBacktestFormOpen(true)}
             >
               다시 실행
-            </button>
+            </Button>
           )}
         </div>
 
@@ -849,9 +847,22 @@ function StrategyDetailPage() {
               <p>결과를 기반으로 전략의 위험 수준과 주요 위험 요인을 분석해보세요.</p>
             </div>
 
-            <button type="button" disabled={isAiSubmitting} onClick={() => void handleAiAnalysis()}>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              loading={isAiSubmitting}
+              leadingIcon={
+                isAiSubmitting ? (
+                  <LoaderCircle className="strategy-detail__spinner" />
+                ) : (
+                  <ShieldCheck />
+                )
+              }
+              onClick={() => void handleAiAnalysis()}
+            >
               {isAiSubmitting ? '분석 요청 중...' : '위험 분석 시작'}
-            </button>
+            </Button>
           </div>
         ) : aiAnalysis.status === 'PENDING' ? (
           <div className="strategy-detail__processing">
@@ -868,16 +879,24 @@ function StrategyDetailPage() {
 
             <div>
               <strong>위험 분석을 완료하지 못했습니다.</strong>
-
               <p>{aiAnalysis.message || aiError || '잠시 후 다시 시도해주세요.'}</p>
 
-              <button
+              <Button
                 type="button"
-                disabled={isAiSubmitting}
+                variant="secondary"
+                size="sm"
+                loading={isAiSubmitting}
+                leadingIcon={
+                  isAiSubmitting ? (
+                    <LoaderCircle className="strategy-detail__spinner" />
+                  ) : (
+                    <RotateCcw />
+                  )
+                }
                 onClick={() => void handleAiAnalysis()}
               >
-                다시 분석
-              </button>
+                {isAiSubmitting ? '분석 중...' : '다시 분석'}
+              </Button>
             </div>
           </div>
         ) : (
@@ -963,21 +982,23 @@ function StrategyDetailPage() {
               <strong>자동매매 준비가 완료되었습니다.</strong>
               <p>전략을 활성화하면 실시간 시세를 기준으로 매매 조건 감지를 시작합니다.</p>
 
-              <button
+              <Button
                 type="button"
-                className="strategy-detail__primary-button"
-                disabled={isStrategyActivating || requiresRevalidation}
+                variant="primary"
+                size="md"
+                loading={isStrategyActivating}
+                disabled={requiresRevalidation}
+                leadingIcon={
+                  isStrategyActivating ? (
+                    <LoaderCircle className="strategy-detail__spinner" />
+                  ) : (
+                    <Activity />
+                  )
+                }
                 onClick={() => void handleStrategyActivation()}
               >
-                {isStrategyActivating ? (
-                  <>
-                    <LoaderCircle className="strategy-detail__spinner" size={17} />
-                    활성화 중
-                  </>
-                ) : (
-                  '전략 활성화'
-                )}
-              </button>
+                {isStrategyActivating ? '활성화 중' : '전략 활성화'}
+              </Button>
 
               {strategyActivationError && (
                 <p className="strategy-detail__inline-error">{strategyActivationError}</p>
@@ -992,21 +1013,22 @@ function StrategyDetailPage() {
                 </p>
               </div>
 
-              <button
+              <Button
                 type="button"
-                className="strategy-detail__deactivate-button"
-                disabled={isStrategyActivating}
+                variant="danger"
+                size="md"
+                loading={isStrategyActivating}
+                leadingIcon={
+                  isStrategyActivating ? (
+                    <LoaderCircle className="strategy-detail__spinner" />
+                  ) : (
+                    <Square />
+                  )
+                }
                 onClick={() => void handleStrategyDeactivation()}
               >
-                {isStrategyActivating ? (
-                  <>
-                    <LoaderCircle className="strategy-detail__spinner" size={16} />
-                    중지 중
-                  </>
-                ) : (
-                  '전략 비활성화'
-                )}
-              </button>
+                {isStrategyActivating ? '중지 중' : '전략 비활성화'}
+              </Button>
             </div>
           )}
         </section>
@@ -1085,6 +1107,7 @@ function BacktestFormSection({
                 }))
               }
             />
+
             <span>원</span>
           </div>
         </label>
@@ -1094,31 +1117,29 @@ function BacktestFormSection({
 
       <div className="strategy-detail__form-actions">
         {canCancel && (
-          <button
+          <Button
             type="button"
-            className="strategy-detail__secondary-button"
+            variant="ghost"
+            size="md"
             disabled={isSubmitting}
             onClick={onCancel}
           >
             취소
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           type="button"
-          className="strategy-detail__primary-button"
-          disabled={isSubmitting}
+          variant="primary"
+          size="md"
+          loading={isSubmitting}
+          leadingIcon={
+            isSubmitting ? <LoaderCircle className="strategy-detail__spinner" /> : <Play />
+          }
           onClick={onSubmit}
         >
-          {isSubmitting ? (
-            <>
-              <LoaderCircle className="strategy-detail__spinner" size={17} />
-              실행 중
-            </>
-          ) : (
-            '백테스트 실행'
-          )}
-        </button>
+          {isSubmitting ? '실행 중' : '백테스트 실행'}
+        </Button>
       </div>
     </div>
   );
@@ -1174,7 +1195,6 @@ function BacktestResultSection({ backtest, error }: { backtest: BacktestDetail; 
         />
 
         <ResultValue label="최대 낙폭" value={formatPercent(backtest.mdd)} />
-
         <ResultValue label="승률" value={formatPercent(backtest.winRate)} />
 
         <ResultValue
@@ -1333,16 +1353,18 @@ function AutoTradingSetupSection({
           <p>활성화 후 전략 감지를 시작하기 전까지는 주문이 발생하지 않습니다.</p>
         </div>
 
-        <button type="button" disabled={isSubmitting} onClick={onSubmit}>
-          {isSubmitting ? (
-            <>
-              <LoaderCircle className="strategy-detail__spinner" size={17} />
-              활성화 중...
-            </>
-          ) : (
-            '자동매매 활성화'
-          )}
-        </button>
+        <Button
+          type="button"
+          variant="primary"
+          size="md"
+          loading={isSubmitting}
+          leadingIcon={
+            isSubmitting ? <LoaderCircle className="strategy-detail__spinner" /> : <Power />
+          }
+          onClick={onSubmit}
+        >
+          {isSubmitting ? '활성화 중...' : '자동매매 활성화'}
+        </Button>
       </div>
     </div>
   );
@@ -1363,9 +1385,9 @@ function CommonTradingLimit({
           <p>모든 자동매매 전략에 공통으로 적용됩니다.</p>
         </div>
 
-        <button type="button" onClick={onLimit}>
+        <Button type="button" variant="ghost" size="sm" onClick={onLimit}>
           한도 변경
-        </button>
+        </Button>
       </div>
 
       <div className="strategy-detail__common-limit-values">
@@ -1373,10 +1395,12 @@ function CommonTradingLimit({
           label="일 최대 주문 금액"
           value={formatWon(tradingLimit.dailyMaxOrderAmount)}
         />
+
         <AutoTradingValue
           label="일 최대 주문 횟수"
           value={`${tradingLimit.dailyMaxOrderCount.toLocaleString('ko-KR')}회`}
         />
+
         <AutoTradingValue
           label="일 손실 한도"
           value={`${tradingLimit.dailyLossLimitRate.toLocaleString('ko-KR')}%`}
@@ -1476,18 +1500,29 @@ function AutoTradingActiveSection({
       {error && <p className="strategy-detail__inline-error">{error}</p>}
 
       <div className="strategy-detail__auto-actions">
-        <button type="button" className="strategy-detail__secondary-button" onClick={onOrders}>
-          주문·체결 보기
-        </button>
-
-        <button
+        <Button
           type="button"
-          className="strategy-detail__stop-button"
-          disabled={isSubmitting || isStrategyActive}
+          variant="secondary"
+          size="md"
+          leadingIcon={<ReceiptText />}
+          onClick={onOrders}
+        >
+          주문·체결 보기
+        </Button>
+
+        <Button
+          type="button"
+          variant="danger"
+          size="md"
+          loading={isSubmitting}
+          disabled={isStrategyActive}
+          leadingIcon={
+            isSubmitting ? <LoaderCircle className="strategy-detail__spinner" /> : <Power />
+          }
           onClick={onStop}
         >
           {isSubmitting ? '중지 중...' : '자동매매 중지'}
-        </button>
+        </Button>
       </div>
 
       {isStrategyActive && (

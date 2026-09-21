@@ -102,6 +102,10 @@
     }
   }
 
+  /*
+   * 가격 조회 기간은 CTA가 아니라 segmented selection에 가까운
+   * 전용 컨트롤이므로 공통 Button을 사용하지 않는다.
+   */
   &__periods {
     display: flex;
     align-items: center;
@@ -110,26 +114,32 @@
 
   &__period {
     padding: 7px 10px;
-    border: 0;
-    border-radius: $radius-sm;
-    background: transparent;
     color: $color-gray-500;
+    font: inherit;
     font-size: 13px;
     font-weight: 500;
+    background: transparent;
+    border: 0;
+    border-radius: $radius-sm;
     cursor: pointer;
     transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
+      background-color $duration-fast $ease-out,
+      color $duration-fast $ease-out;
 
     &:hover {
-      background: $color-gray-100;
       color: $color-gray-900;
+      background: $color-gray-100;
     }
 
     &--active {
-      background: $color-gray-100;
       color: $color-gray-900;
       font-weight: 600;
+      background: $color-gray-100;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary-line;
+      outline-offset: 1px;
     }
   }
 
@@ -155,9 +165,9 @@
   &__candle-tooltip {
     min-width: 150px;
     padding: 12px 14px;
+    background: $color-white;
     border: 1px solid $color-gray-200;
     border-radius: $radius-sm;
-    background: $color-white;
     box-shadow: 0 4px 12px rgb(17 24 39 / 8%);
 
     > strong {
@@ -215,22 +225,9 @@
       font-size: 14px;
     }
 
-    button {
+    > .button {
+      min-width: 126px;
       flex-shrink: 0;
-      height: 44px;
-      padding: 0 20px;
-      border: 0;
-      border-radius: $radius-sm;
-      background: $color-primary;
-      color: $color-white;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-
-      &:hover {
-        background: $color-primary-hover;
-      }
     }
   }
 
@@ -252,9 +249,9 @@
     flex: 0 0 42px;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background: $color-gray-100;
     color: $color-primary;
+    background: $color-gray-100;
+    border-radius: 50%;
   }
 
   &__account-content {
@@ -275,23 +272,8 @@
       line-height: 1.6;
     }
 
-    button {
-      height: 42px;
+    > .button {
       margin-top: 20px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: $radius-sm;
-      background: $color-primary;
-      color: $color-white;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
-
-      &:hover {
-        background: $color-primary-hover;
-      }
     }
   }
 
@@ -352,7 +334,7 @@
       align-items: stretch;
       flex-direction: column;
 
-      button {
+      > .button {
         width: 100%;
       }
     }
@@ -378,7 +360,7 @@
         font-size: 13px;
       }
 
-      button {
+      > .button {
         width: 100%;
       }
     }

@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
+import HelpChat from '../help-chat/HelpChat';
 import BottomNavigation from './BottomNavigation';
 import DesktopHeader from './DesktopHeader';
 import MobileHeader from './MobileHeader';
@@ -17,6 +18,7 @@ function AppLayout() {
       </main>
 
       <BottomNavigation />
+      <HelpChat />
     </div>
   );
 }

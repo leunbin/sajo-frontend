@@ -115,11 +115,11 @@
     height: 46px;
     align-items: center;
     border: 1px solid $color-gray-300;
-    border-radius: $radius-sm;
+    border-radius: $radius-control;
     background: $color-white;
     transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
+      border-color $duration-fast $ease-out,
+      box-shadow $duration-fast $ease-out;
 
     &:focus-within {
       border-color: $color-gray-700;
@@ -172,7 +172,7 @@
     margin-top: 20px;
     padding: 12px 14px;
     border-left: 3px solid $color-rise;
-    background: rgb(229 72 77 / 5%);
+    background: $color-rise-soft;
     color: $color-rise;
     font-size: 13px;
     line-height: 1.5;
@@ -184,47 +184,18 @@
     gap: 10px;
     padding: 28px 0 12px;
     border-top: 1px solid $color-gray-200;
-
-    button {
-      height: 44px;
-      padding: 0 20px;
-      border-radius: $radius-sm;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-
-      &:disabled {
-        cursor: default;
-        opacity: 0.55;
-      }
-    }
-  }
-
-  &__cancel {
-    border: 1px solid $color-gray-300;
-    background: $color-white;
-    color: $color-gray-700;
-
-    &:hover:not(:disabled) {
-      background: $color-gray-50;
-    }
   }
 
   &__submit {
     min-width: 126px;
-    border: 1px solid $color-primary;
-    background: $color-primary;
-    color: $color-white;
-
-    &:hover:not(:disabled) {
-      border-color: $color-primary-hover;
-      background: $color-primary-hover;
-    }
   }
 
   &__state {
-    padding: 100px 0;
+    display: flex;
+    min-height: 420px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     color: $color-gray-500;
     text-align: center;
 
@@ -240,23 +211,6 @@
       margin: 8px auto 20px;
       font-size: 14px;
       line-height: 1.6;
-    }
-
-    button {
-      height: 42px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: $radius-sm;
-      background: $color-primary;
-      color: $color-white;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-
-      &:hover {
-        background: $color-primary-hover;
-      }
     }
   }
 
@@ -294,13 +248,23 @@
     &__actions {
       gap: 8px;
 
-      button {
+      .button {
         flex: 1;
       }
     }
 
+    &__submit {
+      min-width: 0;
+    }
+
     &__state {
-      padding: 72px 0;
+      min-height: 360px;
+      padding: 40px 0;
+
+      .button {
+        width: 100%;
+        max-width: 280px;
+      }
     }
   }
 }

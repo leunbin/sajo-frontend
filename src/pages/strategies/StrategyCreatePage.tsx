@@ -1,11 +1,14 @@
 import axios from 'axios';
+import { LoaderCircle, Plus, Search } from 'lucide-react';
 import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { searchStocks } from '../../api/market';
 import { createStrategy } from '../../api/strategy';
+import Button from '../../components/common/Button/Button';
 import type { MarketStockSearch } from '../../types/market';
 import type { StrategyCreateRequest } from '../../types/strategy';
+
 import './StrategyCreatePage.scss';
 
 interface StrategyForm {
@@ -43,11 +46,9 @@ function StrategyCreatePage() {
   const stockCode = searchParams.get('stockCode');
 
   const [stock, setStock] = useState<MarketStockSearch | null>(null);
-
   const [form, setForm] = useState<StrategyForm>(INITIAL_FORM);
 
   const [isStockLoading, setIsStockLoading] = useState(true);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [stockError, setStockError] = useState('');
@@ -228,9 +229,15 @@ function StrategyCreatePage() {
           <strong>선택된 종목이 없습니다.</strong>
           <p>종목을 먼저 선택한 뒤 전략을 만들어주세요.</p>
 
-          <button type="button" onClick={() => navigate('/stocks')}>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            leadingIcon={<Search size={16} />}
+            onClick={() => navigate('/stocks')}
+          >
             종목 탐색하기
-          </button>
+          </Button>
         </div>
       </section>
     );
@@ -258,7 +265,9 @@ function StrategyCreatePage() {
     <section className="strategy-create">
       <header className="strategy-create__header">
         <span>전략 만들기</span>
+
         <h1>{stock.stockName}</h1>
+
         <p>
           {stock.stockCode} · {stock.marketType}
         </p>
@@ -428,18 +437,27 @@ function StrategyCreatePage() {
         )}
 
         <div className="strategy-create__actions">
-          <button
+          <Button
             type="button"
-            className="strategy-create__cancel"
-            onClick={() => navigate(`/stocks/${stock.stockCode}`)}
+            variant="ghost"
+            size="lg"
             disabled={isSubmitting}
+            onClick={() => navigate(`/stocks/${stock.stockCode}`)}
           >
             취소
-          </button>
+          </Button>
 
-          <button type="submit" className="strategy-create__submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            loading={isSubmitting}
+            leadingIcon={
+              isSubmitting ? <LoaderCircle className="strategy-create__spinner" /> : <Plus />
+            }
+          >
             {isSubmitting ? '전략을 만들고 있습니다...' : '전략 만들기'}
-          </button>
+          </Button>
         </div>
       </form>
     </section>

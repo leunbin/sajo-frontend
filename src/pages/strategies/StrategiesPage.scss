@@ -26,26 +26,13 @@
     }
   }
 
+  /*
+   * 버튼의 색상, border, radius, hover 등은
+   * 공통 Button 컴포넌트가 담당한다.
+   * 페이지에서는 배치에 필요한 속성만 관리한다.
+   */
   &__create {
-    display: inline-flex;
-    height: 42px;
     flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: $radius-sm;
-    background: $color-primary;
-    color: $color-white;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-
-    &:hover {
-      background: $color-primary-hover;
-    }
   }
 
   &__toolbar {
@@ -60,14 +47,18 @@
     display: flex;
     gap: 26px;
 
+    /*
+     * SlidingTabs는 액션 버튼이 아니라 상태 탐색 컨트롤이므로
+     * 공통 Button 스타일을 적용하지 않는다.
+     */
     button {
       position: relative;
       padding: 0 1px 13px;
-      border: 0;
-      background: transparent;
       color: $color-gray-500;
       font: inherit;
       font-size: 14px;
+      background: transparent;
+      border: 0;
       cursor: pointer;
 
       &::after {
@@ -105,6 +96,10 @@
     border-bottom: 1px solid $color-gray-200;
   }
 
+  /*
+   * 전략 한 행 전체가 상세 페이지로 이동하는 인터랙션이므로
+   * 일반 CTA Button으로 변경하지 않는다.
+   */
   &__row {
     display: grid;
     width: 100%;
@@ -115,14 +110,16 @@
     align-items: center;
     gap: 32px;
     padding: 24px 4px;
-    border: 0;
-    border-bottom: 1px solid $color-gray-100;
-    background: transparent;
     color: inherit;
     font: inherit;
     text-align: left;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid $color-gray-100;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition:
+      background $duration-fast $ease-out,
+      padding $duration-fast $ease-out;
 
     &:last-child {
       border-bottom: 0;
@@ -130,6 +127,18 @@
 
     &:hover {
       background: $color-gray-50;
+
+      .strategies-page__arrow {
+        color: $color-gray-500;
+        transform: translateX(2px);
+      }
+    }
+
+    &:focus-visible {
+      position: relative;
+      z-index: 1;
+      outline: 2px solid $color-primary-line;
+      outline-offset: -2px;
     }
   }
 
@@ -163,23 +172,23 @@
   &__status {
     flex-shrink: 0;
     padding: 4px 7px;
-    border-radius: $radius-sm;
     font-size: 11px;
     font-weight: 600;
+    border-radius: $radius-sm;
 
     &--active {
-      background: rgb(22 199 132 / 10%);
       color: $color-primary-hover;
+      background: $color-primary-soft;
     }
 
     &--inactive {
-      background: $color-gray-100;
       color: $color-gray-500;
+      background: $color-gray-100;
     }
 
     &--deleted {
-      background: rgb(229 72 77 / 8%);
       color: $color-rise;
+      background: $color-rise-soft;
     }
   }
 
@@ -202,6 +211,9 @@
 
   &__arrow {
     color: $color-gray-300;
+    transition:
+      color $duration-fast $ease-out,
+      transform $duration-fast $ease-out;
   }
 
   &__more {
@@ -209,25 +221,8 @@
     justify-content: center;
     padding-top: 28px;
 
-    button {
-      height: 40px;
-      padding: 0 20px;
-      border: 1px solid $color-gray-300;
-      border-radius: $radius-sm;
-      background: $color-white;
-      color: $color-gray-700;
-      font: inherit;
-      font-size: 13px;
-      cursor: pointer;
-
-      &:hover:not(:disabled) {
-        background: $color-gray-50;
-      }
-
-      &:disabled {
-        cursor: default;
-        opacity: 0.55;
-      }
+    > .button {
+      min-width: 118px;
     }
   }
 
@@ -249,21 +244,12 @@
       line-height: 1.5;
     }
 
-    button {
-      height: 40px;
-      padding: 0 16px;
-      border: 0;
-      border-radius: $radius-sm;
-      background: $color-primary;
-      color: $color-white;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-
-      &:hover {
-        background: $color-primary-hover;
-      }
+    /*
+     * 버튼의 시각 스타일은 공통 Button이 담당.
+     * 빈 상태에서는 콘텐츠 너비에 맞게 유지한다.
+     */
+    > .button {
+      margin: 0 auto;
     }
 
     &--error {
@@ -292,44 +278,47 @@
       }
     }
 
-    &__create {
+    /*
+     * 모바일에서는 텍스트 CTA 대신 우측 상단 + 아이콘 액션으로 유지한다.
+     * Button의 기본 skin을 제거하는 것이 아니라,
+     * 이 화면에서만 icon action 형태로 재배치한다.
+     */
+    &__create.button {
       position: absolute;
       top: 0;
       right: 0;
-
-      display: flex;
       width: 44px;
+      min-width: 44px;
       height: 44px;
-      align-items: center;
-      justify-content: center;
-
-      gap: 0;
       padding: 0;
-      border: 0;
-      border-radius: 50%;
-
-      background: transparent;
       color: $color-primary;
+      background: transparent;
+      border-radius: 50%;
+      box-shadow: none;
 
-      /*
-       * JSX의 "새 전략 만들기" 텍스트를
-       * 모바일에서 숨긴다.
-       */
-      font-size: 0;
+      .button__icon {
+        margin: 0;
 
-      svg {
-        width: 25px;
-        height: 25px;
-        stroke-width: 2;
+        svg {
+          width: 25px;
+          height: 25px;
+          stroke-width: 2;
+        }
       }
 
-      &:hover {
-        background: rgb(22 199 132 / 8%);
+      .button__label {
+        display: none;
+      }
+
+      &:hover:not(:disabled) {
         color: $color-primary-hover;
+        background: $color-primary-soft;
+        box-shadow: none;
       }
 
-      &:active {
-        background: rgb(22 199 132 / 12%);
+      &:active:not(:disabled) {
+        background: $color-primary-soft;
+        transform: none;
       }
     }
 
@@ -374,6 +363,14 @@
 
     &__state {
       padding: 72px 16px;
+    }
+
+    &__more {
+      padding-top: 24px;
+
+      > .button {
+        min-width: 116px;
+      }
     }
   }
 }
