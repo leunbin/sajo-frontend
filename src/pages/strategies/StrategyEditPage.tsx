@@ -3,6 +3,7 @@ import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { getStrategy, updateStrategy } from '../../api/strategy';
+import { invalidateStrategyValidation } from '../../utils/strategyValidation';
 import type { StrategyDetail, StrategyUpdateRequest } from '../../types/strategy';
 
 import './StrategyEditPage.scss';
@@ -222,6 +223,8 @@ function StrategyEditPage() {
       setFormError('');
 
       await updateStrategy(strategyId, request);
+
+      invalidateStrategyValidation(strategyId);
 
       navigate(`/strategies/${strategyId}`);
     } catch (error) {
