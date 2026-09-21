@@ -18,6 +18,7 @@ import {
 } from '../../api/autoTrading';
 import { createBacktest, getBacktestDetail, getBacktests } from '../../api/backtest';
 import { getStrategy, updateStrategyActivation } from '../../api/strategy';
+import StrategyManagementActions from '../../components/strategy/StrategyManagementActions';
 
 import type {
   AiRiskAnalysisDetail,
@@ -624,11 +625,15 @@ function StrategyDetailPage() {
           <p>{strategy.stockCode}</p>
         </div>
 
-        <span
-          className={`strategy-detail__status strategy-detail__status--${strategy.status.toLowerCase()}`}
-        >
-          {getStrategyStatusLabel(strategy.status)}
-        </span>
+        <div className="strategy-detail__header-side">
+          <span
+            className={`strategy-detail__status strategy-detail__status--${strategy.status.toLowerCase()}`}
+          >
+            {getStrategyStatusLabel(strategy.status)}
+          </span>
+
+          <StrategyManagementActions strategy={strategy} />
+        </div>
       </header>
 
       <section className="strategy-detail__section">

@@ -73,3 +73,32 @@ export interface StrategyActivationResponse {
   status: StrategyStatus;
   activatedAt: string | null;
 }
+
+export interface StrategyUpdateRequest {
+  strategyName?: string;
+  buyConditionPrice?: number;
+  sellConditionPrice?: number;
+  stopLossRate?: number;
+  targetReturnRate?: number;
+  allocatedAmount?: number;
+  orderAmount?: number;
+  perCondition?: number;
+  pbrCondition?: number;
+  roeCondition?: number;
+}
+
+export interface StrategyUpdateResponse {
+  strategyId: string;
+  stockCode: string;
+  strategyName: string;
+  buyConditionPrice: number;
+  sellConditionPrice: number;
+  stopLossRate: number;
+  targetReturnRate: number | null;
+  allocatedAmount: number;
+  orderAmount: number;
+  perCondition: number | null;
+  pbrCondition: number | null;
+  roeCondition: number | null;
+  status: StrategyStatus;
+}
