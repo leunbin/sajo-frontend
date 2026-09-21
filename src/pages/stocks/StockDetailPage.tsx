@@ -1,12 +1,14 @@
 import axios from 'axios';
-import { Link2 } from 'lucide-react';
+import { Link2, Plus } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { getMyAccount } from '../../api/account';
 import { getStockChart, getStockSummary } from '../../api/market';
+import Button from '../../components/common/Button/Button';
 import type { StockPrice, StockSummary } from '../../types/market';
+
 import './StockDetailPage.scss';
 
 const CHART_PERIODS = [
@@ -312,9 +314,15 @@ function StockDetailPage() {
 
             <p>한국투자증권 계좌를 연결하면 현재 시세와 투자 정보를 확인할 수 있습니다.</p>
 
-            <button type="button" onClick={() => navigate('/account')}>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              leadingIcon={<Link2 size={16} />}
+              onClick={() => navigate('/account')}
+            >
               계좌 연결하기
-            </button>
+            </Button>
           </div>
         </div>
       </section>
@@ -471,12 +479,15 @@ function StockDetailPage() {
           <p>매수·매도 가격과 투자 지표 조건을 직접 설정할 수 있습니다.</p>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="primary"
+          size="lg"
+          leadingIcon={<Plus size={17} />}
           onClick={() => navigate(`/strategies/new?stockCode=${stock.stockCode}`)}
         >
           전략 만들기
-        </button>
+        </Button>
       </section>
     </section>
   );

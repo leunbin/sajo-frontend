@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 
 import { getExecutionDetail, getExecutions } from '../../api/execution';
 import { getOrderDetail, getOrders } from '../../api/order';
+import Button from '../../components/common/Button/Button';
 import SlidingTabs from '../../components/common/SlidingTabs/SlidingTabs';
 
 import type { Execution } from '../../types/execution';
@@ -262,22 +263,25 @@ function OrdersPage() {
             <p>자동매매에서 발생한 주문과 실제 체결 내역을 확인합니다.</p>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             className="orders-page__refresh"
             disabled={isLoading || isRefreshing}
+            leadingIcon={
+              <RefreshCw
+                size={16}
+                className={
+                  isRefreshing
+                    ? 'orders-page__refresh-icon orders-page__refresh-icon--loading'
+                    : 'orders-page__refresh-icon'
+                }
+              />
+            }
             onClick={() => void handleRefresh()}
           >
-            <RefreshCw
-              size={16}
-              className={
-                isRefreshing
-                  ? 'orders-page__refresh-icon orders-page__refresh-icon--loading'
-                  : 'orders-page__refresh-icon'
-              }
-            />
             새로고침
-          </button>
+          </Button>
         </header>
 
         <div className="orders-page__view-tabs">
@@ -341,9 +345,14 @@ function OrdersPage() {
 
               <p>{error}</p>
 
-              <button type="button" onClick={() => void handleRefresh()}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leadingIcon={<RefreshCw size={15} />}
+                onClick={() => void handleRefresh()}
+              >
                 다시 시도
-              </button>
+              </Button>
             </div>
           </PageState>
         ) : isEmpty ? (
@@ -880,9 +889,9 @@ function DetailShell({
         <div className="orders-page__detail-content">{children}</div>
 
         <footer className="orders-page__detail-footer">
-          <button type="button" onClick={onClose}>
+          <Button variant="secondary" size="md" onClick={onClose}>
             닫기
-          </button>
+          </Button>
         </footer>
       </aside>
     </div>

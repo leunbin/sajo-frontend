@@ -1,9 +1,11 @@
 import axios from 'axios';
-import { LoaderCircle, MoreHorizontal } from 'lucide-react';
+import { LoaderCircle, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { deleteStrategy } from '../../api/strategy';
+import Button from '../common/Button/Button';
+
 import type { StrategyDetail } from '../../types/strategy';
 
 import './StrategyManagementActions.scss';
@@ -109,14 +111,16 @@ function StrategyManagementActions({ strategy }: StrategyManagementActionsProps)
     <>
       <div className="strategy-management">
         <div className="strategy-management__actions">
-          <button
+          <Button
             type="button"
-            className="strategy-management__edit"
+            variant="secondary"
+            size="md"
+            leadingIcon={<Pencil />}
             disabled={isActive}
             onClick={handleEdit}
           >
             전략 수정
-          </button>
+          </Button>
 
           <div ref={menuRef} className="strategy-management__menu-wrap">
             <button
@@ -134,7 +138,8 @@ function StrategyManagementActions({ strategy }: StrategyManagementActionsProps)
             {isMenuOpen && !isActive && (
               <div className="strategy-management__menu" role="menu">
                 <button type="button" role="menuitem" onClick={handleDeleteRequest}>
-                  전략 삭제
+                  <Trash2 size={15} />
+                  <span>전략 삭제</span>
                 </button>
               </div>
             )}
@@ -165,6 +170,10 @@ function StrategyManagementActions({ strategy }: StrategyManagementActionsProps)
             aria-modal="true"
             aria-labelledby="strategy-delete-title"
           >
+            <div className="strategy-management__modal-icon">
+              <Trash2 size={20} />
+            </div>
+
             <h2 id="strategy-delete-title">전략을 삭제하시겠어요?</h2>
 
             <p>
@@ -180,9 +189,10 @@ function StrategyManagementActions({ strategy }: StrategyManagementActionsProps)
             )}
 
             <div className="strategy-management__modal-actions">
-              <button
+              <Button
                 type="button"
-                className="strategy-management__modal-cancel"
+                variant="ghost"
+                size="md"
                 disabled={isDeleting}
                 onClick={() => {
                   setIsDeleteModalOpen(false);
@@ -190,23 +200,24 @@ function StrategyManagementActions({ strategy }: StrategyManagementActionsProps)
                 }}
               >
                 취소
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
-                className="strategy-management__modal-delete"
-                disabled={isDeleting}
+                variant="danger"
+                size="md"
+                loading={isDeleting}
+                leadingIcon={
+                  isDeleting ? (
+                    <LoaderCircle className="strategy-management__spinner" />
+                  ) : (
+                    <Trash2 />
+                  )
+                }
                 onClick={() => void handleDelete()}
               >
-                {isDeleting ? (
-                  <>
-                    <LoaderCircle className="strategy-management__spinner" size={16} />
-                    삭제 중
-                  </>
-                ) : (
-                  '삭제'
-                )}
-              </button>
+                {isDeleting ? '삭제 중' : '삭제'}
+              </Button>
             </div>
           </div>
         </div>

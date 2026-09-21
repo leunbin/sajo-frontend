@@ -2,8 +2,10 @@ import axios from 'axios';
 import { Search } from 'lucide-react';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { getStocks, searchStocks } from '../../api/market';
 import type { MarketStock } from '../../types/market';
+
 import './StocksPage.scss';
 
 const PAGE_SIZE = 20;
@@ -15,11 +17,9 @@ function StocksPage() {
   const [stocks, setStocks] = useState<MarketStock[]>([]);
   const [keyword, setKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
-
   const [page, setPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(true);
-
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -75,7 +75,7 @@ function StocksPage() {
       }
     };
 
-    fetchStocks();
+    void fetchStocks();
 
     return () => {
       ignore = true;
@@ -139,11 +139,13 @@ function StocksPage() {
       <div className="stocks-page__list-header">
         <h2>{debouncedKeyword ? '검색 결과' : '전체 종목'}</h2>
 
-        {!isLoading || stocks.length > 0 ? <span>{totalElements.toLocaleString()}개</span> : null}
+        {!isLoading || stocks.length > 0 ? (
+          <span>{totalElements.toLocaleString('ko-KR')}개</span>
+        ) : null}
       </div>
 
       {errorMessage && stocks.length === 0 ? (
-        <div className="stocks-page__state">
+        <div className="stocks-page__state stocks-page__state--error">
           <p>{errorMessage}</p>
         </div>
       ) : null}
@@ -201,14 +203,13 @@ const formatMarketCap = (marketCap: number | null): string => {
   }
 
   const trillion = Math.floor(marketCap / 1_000_000_000_000);
-
   const billion = Math.floor((marketCap % 1_000_000_000_000) / 100_000_000);
 
   if (trillion > 0) {
-    return billion > 0 ? `${trillion}조 ${billion.toLocaleString()}억` : `${trillion}조`;
+    return billion > 0 ? `${trillion}조 ${billion.toLocaleString('ko-KR')}억` : `${trillion}조`;
   }
 
-  return `${Math.floor(marketCap / 100_000_000).toLocaleString()}억`;
+  return `${Math.floor(marketCap / 100_000_000).toLocaleString('ko-KR')}억`;
 };
 
 export default StocksPage;

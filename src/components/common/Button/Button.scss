@@ -1,0 +1,172 @@
+@use '../../../styles/abstracts/variables' as *;
+
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 16px;
+
+  color: $color-gray-900;
+  font-family: $font-sans;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: $tracking-normal;
+  white-space: nowrap;
+
+  background: transparent;
+  border: 0;
+  border-radius: $radius-control;
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    color $duration-base $ease-out,
+    background-color $duration-base $ease-out,
+    box-shadow $duration-base $ease-out,
+    transform $duration-fast $ease-out,
+    opacity $duration-fast ease;
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+  }
+
+  // Size
+
+  &--sm {
+    height: 34px;
+    gap: 6px;
+    padding: 0 12px;
+    font-size: 12px;
+
+    .button__icon svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &--md {
+    height: 40px;
+  }
+
+  &--lg {
+    height: 44px;
+    padding: 0 18px;
+    font-size: 14px;
+
+    .button__icon svg {
+      width: 17px;
+      height: 17px;
+    }
+  }
+
+  &--full-width {
+    width: 100%;
+  }
+
+  // Primary
+
+  &--primary {
+    color: $color-white;
+    background: $color-primary;
+    box-shadow: 0 1px 2px hsl(162 44% 20% / 0.12);
+
+    &:hover:not(:disabled) {
+      background: $color-primary-hover;
+      box-shadow: 0 4px 12px hsl(162 44% 20% / 0.14);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      box-shadow: 0 1px 2px hsl(162 44% 20% / 0.12);
+      transform: translateY(0);
+    }
+  }
+
+  // Secondary
+
+  &--secondary {
+    color: $color-gray-700;
+    background: $color-gray-100;
+
+    &:hover:not(:disabled) {
+      color: $color-gray-900;
+      background: $color-gray-200;
+    }
+
+    &:active:not(:disabled) {
+      background: $color-gray-300;
+    }
+  }
+
+  // Ghost
+
+  &--ghost {
+    color: $color-gray-500;
+    background: transparent;
+
+    &:hover:not(:disabled) {
+      color: $color-gray-800;
+      background: $color-gray-100;
+    }
+
+    &:active:not(:disabled) {
+      background: $color-gray-200;
+    }
+  }
+
+  // Danger
+
+  &--danger {
+    color: $color-gray-600;
+    background: $color-gray-100;
+
+    &:hover:not(:disabled) {
+      color: $color-rise-strong;
+      background: $color-rise-soft;
+    }
+
+    &:active:not(:disabled) {
+      color: $color-rise-strong;
+      background: hsl(358 70% 93%);
+    }
+  }
+
+  // States
+
+  &:focus-visible {
+    box-shadow:
+      0 0 0 2px $color-white,
+      0 0 0 4px $color-primary-line;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.46;
+    transform: none;
+  }
+
+  &--loading {
+    cursor: wait;
+  }
+}
