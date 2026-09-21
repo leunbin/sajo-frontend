@@ -19,6 +19,10 @@ import {
 import { createBacktest, getBacktestDetail, getBacktests } from '../../api/backtest';
 import { getStrategy, updateStrategyActivation } from '../../api/strategy';
 import StrategyManagementActions from '../../components/strategy/StrategyManagementActions';
+import {
+  completeStrategyRevalidation,
+  needsStrategyRevalidation,
+} from '../../utils/strategyValidation';
 
 import type {
   AiRiskAnalysisDetail,
@@ -78,6 +82,8 @@ function StrategyDetailPage() {
 
   const [isAutoTradingSubmitting, setIsAutoTradingSubmitting] = useState(false);
   const [autoTradingError, setAutoTradingError] = useState('');
+
+  const [requiresRevalidation, setRequiresRevalidation] = useState(false);
 
   const backtestPollingRef = useRef(false);
   const aiPollingRef = useRef(false);
@@ -170,6 +176,12 @@ function StrategyDetailPage() {
         if (result.status === 'COMPLETED') {
           setBacktestError('');
           setAiAnalysis(null);
+
+          if (needsStrategyRevalidation(strategyId)) {
+            completeStrategyRevalidation(strategyId);
+            setRequiresRevalidation(false);
+          }
+
           return;
         }
 
@@ -230,6 +242,10 @@ function StrategyDetailPage() {
 
     const loadPage = async () => {
       try {
+        const validationRequired = needsStrategyRevalidation(strategyId);
+
+        setRequiresRevalidation(validationRequired);
+
         const strategyResponse = await getStrategy(strategyId);
 
         if (cancelled) {
@@ -238,8 +254,7 @@ function StrategyDetailPage() {
 
         setStrategy(strategyResponse);
 
-        const [backtestList, existingAutoTrading, existingTradingLimit] = await Promise.all([
-          getBacktests(strategyId, 0, 1),
+        const [existingAutoTrading, existingTradingLimit] = await Promise.all([
           findExistingAutoTrading(strategyId),
           loadTradingLimit(),
         ]);
@@ -265,6 +280,26 @@ function StrategyDetailPage() {
             dailyMaxOrderCount: String(existingTradingLimit.dailyMaxOrderCount),
             dailyLossLimitRate: String(existingTradingLimit.dailyLossLimitRate),
           }));
+        }
+
+        /*
+         * 전략이 수정된 경우 서버에 남아 있는 기존 백테스트와
+         * AI 분석은 현재 전략의 검증 결과로 사용하지 않는다.
+         *
+         * 기존 데이터 자체는 삭제하지 않기 때문에 분석 이력에서는
+         * 계속 조회할 수 있다.
+         */
+        if (validationRequired) {
+          setLatestBacktest(null);
+          setAiAnalysis(null);
+          setIsBacktestFormOpen(true);
+          return;
+        }
+
+        const backtestList = await getBacktests(strategyId, 0, 1);
+
+        if (cancelled) {
+          return;
         }
 
         const latestSummary = backtestList.backtests[0];
@@ -363,6 +398,11 @@ function StrategyDetailPage() {
       setIsBacktestFormOpen(false);
 
       if (firstResult.status === 'COMPLETED') {
+        if (needsStrategyRevalidation(strategyId)) {
+          completeStrategyRevalidation(strategyId);
+          setRequiresRevalidation(false);
+        }
+
         setIsBacktestSubmitting(false);
         return;
       }
@@ -376,12 +416,19 @@ function StrategyDetailPage() {
       void pollBacktest(created.backtestId);
     } catch (error) {
       setBacktestError(getErrorMessage(error, '백테스트 실행에 실패했습니다.'));
+
       setIsBacktestSubmitting(false);
     }
   };
 
   const handleAiAnalysis = async () => {
-    if (!strategyId || !latestBacktest || latestBacktest.status !== 'COMPLETED' || isAiSubmitting) {
+    if (
+      !strategyId ||
+      requiresRevalidation ||
+      !latestBacktest ||
+      latestBacktest.status !== 'COMPLETED' ||
+      isAiSubmitting
+    ) {
       return;
     }
 
@@ -412,14 +459,19 @@ function StrategyDetailPage() {
       void pollAiAnalysis(created.analysisId);
     } catch (error) {
       setAiError(getErrorMessage(error, 'AI 위험 분석 요청에 실패했습니다.'));
+
       setIsAiSubmitting(false);
     }
   };
 
-  // AI 위험 분석을 완료한 뒤 사용자가 명시적으로 전략을 활성화한다.
-  // 자동매매 시작과 전략 활성화는 서로 다른 동작으로 분리한다.
   const handleStrategyActivation = async () => {
-    if (!strategy || aiAnalysis?.status !== 'COMPLETED' || isStrategyActivating) {
+    if (
+      !strategy ||
+      requiresRevalidation ||
+      latestBacktest?.status !== 'COMPLETED' ||
+      aiAnalysis?.status !== 'COMPLETED' ||
+      isStrategyActivating
+    ) {
       return;
     }
 
@@ -506,10 +558,15 @@ function StrategyDetailPage() {
     };
   };
 
-  // 여기서는 전략을 ACTIVE로 변경하지 않는다.
-  // 이미 ACTIVE인 전략에 대해서만 자동매매를 생성/활성화한다.
   const handleAutoTradingStart = async () => {
-    if (!strategyId || !strategy || aiAnalysis?.status !== 'COMPLETED' || isAutoTradingSubmitting) {
+    if (
+      !strategyId ||
+      !strategy ||
+      requiresRevalidation ||
+      latestBacktest?.status !== 'COMPLETED' ||
+      aiAnalysis?.status !== 'COMPLETED' ||
+      isAutoTradingSubmitting
+    ) {
       return;
     }
 
@@ -609,9 +666,9 @@ function StrategyDetailPage() {
     );
   }
 
-  const isBacktestCompleted = latestBacktest?.status === 'COMPLETED';
+  const isBacktestCompleted = !requiresRevalidation && latestBacktest?.status === 'COMPLETED';
 
-  const isAiCompleted = aiAnalysis?.status === 'COMPLETED';
+  const isAiCompleted = !requiresRevalidation && aiAnalysis?.status === 'COMPLETED';
 
   const isStrategyActive = strategy.status === 'ACTIVE';
 
@@ -708,7 +765,7 @@ function StrategyDetailPage() {
             <p>과거 데이터를 기준으로 전략의 성과와 손실 위험을 확인합니다.</p>
           </div>
 
-          {latestBacktest && !isBacktestFormOpen && (
+          {latestBacktest && !isBacktestFormOpen && !requiresRevalidation && (
             <button
               type="button"
               className="strategy-detail__text-action"
@@ -719,13 +776,24 @@ function StrategyDetailPage() {
           )}
         </div>
 
+        {requiresRevalidation && (
+          <div className="strategy-detail__revalidation">
+            <strong>전략이 수정되었습니다.</strong>
+
+            <p>
+              변경된 전략 조건으로 백테스트를 다시 실행해주세요. 이전 백테스트와 위험 분석 결과는
+              분석 이력에서 확인할 수 있습니다.
+            </p>
+          </div>
+        )}
+
         {!latestBacktest || isBacktestFormOpen ? (
           <BacktestFormSection
             form={backtestForm}
             setForm={setBacktestForm}
             isSubmitting={isBacktestSubmitting}
             error={backtestError}
-            canCancel={latestBacktest !== null}
+            canCancel={latestBacktest !== null && !requiresRevalidation}
             onCancel={() => {
               setIsBacktestFormOpen(false);
               setBacktestError('');
@@ -757,7 +825,11 @@ function StrategyDetailPage() {
               <p>결과를 기반으로 전략의 위험 수준과 주요 위험 요인을 분석해보세요.</p>
             </div>
 
-            <button type="button" disabled={isAiSubmitting} onClick={() => void handleAiAnalysis()}>
+            <button
+              type="button"
+              disabled={isAiSubmitting || requiresRevalidation}
+              onClick={() => void handleAiAnalysis()}
+            >
               {isAiSubmitting ? '분석 요청 중...' : '위험 분석 시작'}
             </button>
           </div>
@@ -781,7 +853,7 @@ function StrategyDetailPage() {
 
               <button
                 type="button"
-                disabled={isAiSubmitting}
+                disabled={isAiSubmitting || requiresRevalidation}
                 onClick={() => void handleAiAnalysis()}
               >
                 다시 분석
@@ -829,7 +901,7 @@ function StrategyDetailPage() {
             <button
               type="button"
               className="strategy-detail__primary-button"
-              disabled={isStrategyActivating}
+              disabled={isStrategyActivating || requiresRevalidation}
               onClick={() => void handleStrategyActivation()}
             >
               {isStrategyActivating ? (
