@@ -56,6 +56,13 @@
     }
   }
 
+  &__header-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
   &__status {
     display: inline-flex;
     flex-shrink: 0;
@@ -1193,6 +1200,11 @@
       h1 {
         font-size: 25px;
       }
+    }
+
+    &__header-side {
+      width: 100%;
+      align-items: stretch;
     }
 
     &__section {

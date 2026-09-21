@@ -19,6 +19,7 @@ import StockDetailPage from './pages/stocks/StockDetailPage';
 import StrategiesPage from './pages/strategies/StrategiesPage';
 import StrategyCreatePage from './pages/strategies/StrategyCreatePage';
 import StrategyDetailPage from './pages/strategies/StrategyDetailPage';
+import StrategyEditPage from './pages/strategies/StrategyEditPage';
 import BacktestPage from './pages/strategies/BacktestPage';
 import AiRiskAnalysisPage from './pages/strategies/AiRiskAnalysisPage';
 
@@ -51,6 +52,8 @@ function App() {
             <Route path="/strategies/new" element={<StrategyCreatePage />} />
 
             <Route path="/strategies/:strategyId" element={<StrategyDetailPage />} />
+
+            <Route path="/strategies/:strategyId/edit" element={<StrategyEditPage />} />
 
             <Route path="/strategies/:strategyId/backtest" element={<BacktestPage />} />
 
