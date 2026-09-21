@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { AlertCircle, Check, ChevronRight, LoaderCircle } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
@@ -10,18 +10,18 @@ import {
 } from '../../api/aiRisk';
 import {
   createAutoTrading,
-  createTradingLimit,
   getAutoTradings,
   getTradingLimit,
   updateAutoTrading,
-  updateTradingLimit,
 } from '../../api/autoTrading';
 import { createBacktest, getBacktestDetail, getBacktests } from '../../api/backtest';
 import { getStrategy, updateStrategyActivation } from '../../api/strategy';
 import StrategyManagementActions from '../../components/strategy/StrategyManagementActions';
 import {
   completeStrategyRevalidation,
+  getStrategyValidationState,
   needsStrategyRevalidation,
+  setRevalidationBacktest,
 } from '../../utils/strategyValidation';
 
 import type {
@@ -51,9 +51,6 @@ interface BacktestForm {
 
 interface AutoTradingForm {
   direction: AutoTradingDirection;
-  dailyMaxOrderAmount: string;
-  dailyMaxOrderCount: string;
-  dailyLossLimitRate: string;
 }
 
 function StrategyDetailPage() {
@@ -82,6 +79,7 @@ function StrategyDetailPage() {
 
   const [isAutoTradingSubmitting, setIsAutoTradingSubmitting] = useState(false);
   const [autoTradingError, setAutoTradingError] = useState('');
+  const [isTradingLimitRequired, setIsTradingLimitRequired] = useState(false);
 
   const [requiresRevalidation, setRequiresRevalidation] = useState(false);
 
@@ -96,50 +94,48 @@ function StrategyDetailPage() {
 
   const [autoTradingForm, setAutoTradingForm] = useState<AutoTradingForm>({
     direction: 'BOTH',
-    dailyMaxOrderAmount: '5000000',
-    dailyMaxOrderCount: '10',
-    dailyLossLimitRate: '5',
   });
 
   useEffect(() => {
     document.title = strategy?.strategyName ? `${strategy.strategyName} | SAJO` : '전략 | SAJO';
   }, [strategy?.strategyName]);
 
-  const findExistingAnalysis = async (
-    currentStrategyId: string,
-    backtestId: string
-  ): Promise<AiRiskAnalysisDetail | null> => {
-    try {
-      const history = await getAiRiskAnalysisHistory(0, AI_HISTORY_LOOKUP_SIZE);
+  const findExistingAnalysis = useCallback(
+    async (currentStrategyId: string, backtestId: string): Promise<AiRiskAnalysisDetail | null> => {
+      try {
+        const history = await getAiRiskAnalysisHistory(0, AI_HISTORY_LOOKUP_SIZE);
 
-      const matched = history.content.find(
-        (item: AiRiskAnalysisHistoryItem) =>
-          item.strategyId === currentStrategyId && item.backtestId === backtestId
-      );
+        const matched = history.content.find(
+          (item: AiRiskAnalysisHistoryItem) =>
+            item.strategyId === currentStrategyId && item.backtestId === backtestId
+        );
 
-      if (!matched) {
+        if (!matched) {
+          return null;
+        }
+
+        return await getAiRiskAnalysis(matched.analysisId);
+      } catch {
         return null;
       }
+    },
+    []
+  );
 
-      return await getAiRiskAnalysis(matched.analysisId);
-    } catch {
-      return null;
-    }
-  };
+  const findExistingAutoTrading = useCallback(
+    async (currentStrategyId: string): Promise<AutoTrading | null> => {
+      try {
+        const response = await getAutoTradings(0, AUTO_TRADING_LOOKUP_SIZE);
 
-  const findExistingAutoTrading = async (
-    currentStrategyId: string
-  ): Promise<AutoTrading | null> => {
-    try {
-      const response = await getAutoTradings(0, AUTO_TRADING_LOOKUP_SIZE);
+        return response.content.find((item) => item.strategyId === currentStrategyId) ?? null;
+      } catch {
+        return null;
+      }
+    },
+    []
+  );
 
-      return response.content.find((item) => item.strategyId === currentStrategyId) ?? null;
-    } catch {
-      return null;
-    }
-  };
-
-  const loadTradingLimit = async (): Promise<TradingLimit | null> => {
+  const loadTradingLimit = useCallback(async (): Promise<TradingLimit | null> => {
     try {
       return await getTradingLimit();
     } catch (error) {
@@ -158,80 +154,95 @@ function StrategyDetailPage() {
 
       throw error;
     }
-  };
+  }, []);
 
-  const pollBacktest = async (backtestId: string) => {
-    if (!strategyId || backtestPollingRef.current) {
-      return;
-    }
+  const pollBacktest = useCallback(
+    async (backtestId: string) => {
+      if (!strategyId || backtestPollingRef.current) {
+        return;
+      }
 
-    backtestPollingRef.current = true;
+      backtestPollingRef.current = true;
 
-    try {
-      while (true) {
-        const result = await getBacktestDetail(strategyId, backtestId);
+      try {
+        while (true) {
+          const result = await getBacktestDetail(strategyId, backtestId);
 
-        setLatestBacktest(result);
+          setLatestBacktest(result);
 
-        if (result.status === 'COMPLETED') {
-          setBacktestError('');
-          setAiAnalysis(null);
+          if (result.status === 'COMPLETED') {
+            setBacktestError('');
+            setAiAnalysis(null);
 
-          if (needsStrategyRevalidation(strategyId)) {
-            completeStrategyRevalidation(strategyId);
-            setRequiresRevalidation(false);
+            if (needsStrategyRevalidation(strategyId)) {
+              setRevalidationBacktest(strategyId, result.backtestId);
+            }
+
+            return;
           }
 
-          return;
-        }
+          if (result.status === 'FAILED') {
+            setBacktestError('백테스트를 완료하지 못했습니다.');
+            return;
+          }
 
-        if (result.status === 'FAILED') {
-          setBacktestError('백테스트를 완료하지 못했습니다.');
-          return;
+          await wait(BACKTEST_POLL_INTERVAL);
         }
-
-        await wait(BACKTEST_POLL_INTERVAL);
+      } catch (error) {
+        setBacktestError(getErrorMessage(error, '백테스트 결과를 확인하지 못했습니다.'));
+      } finally {
+        backtestPollingRef.current = false;
+        setIsBacktestSubmitting(false);
       }
-    } catch (error) {
-      setBacktestError(getErrorMessage(error, '백테스트 결과를 확인하지 못했습니다.'));
-    } finally {
-      backtestPollingRef.current = false;
-      setIsBacktestSubmitting(false);
-    }
-  };
+    },
+    [strategyId]
+  );
 
-  const pollAiAnalysis = async (analysisId: string) => {
-    if (aiPollingRef.current) {
-      return;
-    }
-
-    aiPollingRef.current = true;
-
-    try {
-      while (true) {
-        const result = await getAiRiskAnalysis(analysisId);
-
-        setAiAnalysis(result);
-
-        if (result.status === 'COMPLETED') {
-          setAiError('');
-          return;
-        }
-
-        if (result.status === 'FAILED') {
-          setAiError(result.message || 'AI 위험 분석을 완료하지 못했습니다.');
-          return;
-        }
-
-        await wait(AI_POLL_INTERVAL);
+  const pollAiAnalysis = useCallback(
+    async (analysisId: string) => {
+      if (aiPollingRef.current) {
+        return;
       }
-    } catch (error) {
-      setAiError(getErrorMessage(error, 'AI 위험 분석 결과를 확인하지 못했습니다.'));
-    } finally {
-      aiPollingRef.current = false;
-      setIsAiSubmitting(false);
-    }
-  };
+
+      aiPollingRef.current = true;
+
+      try {
+        while (true) {
+          const result = await getAiRiskAnalysis(analysisId);
+
+          setAiAnalysis(result);
+
+          if (result.status === 'COMPLETED') {
+            setAiError('');
+
+            if (strategyId && needsStrategyRevalidation(strategyId)) {
+              const validationState = getStrategyValidationState(strategyId);
+
+              if (validationState?.backtestId === result.backtestId) {
+                completeStrategyRevalidation(strategyId);
+                setRequiresRevalidation(false);
+              }
+            }
+
+            return;
+          }
+
+          if (result.status === 'FAILED') {
+            setAiError(result.message || 'AI 위험 분석을 완료하지 못했습니다.');
+            return;
+          }
+
+          await wait(AI_POLL_INTERVAL);
+        }
+      } catch (error) {
+        setAiError(getErrorMessage(error, 'AI 위험 분석 결과를 확인하지 못했습니다.'));
+      } finally {
+        aiPollingRef.current = false;
+        setIsAiSubmitting(false);
+      }
+    },
+    [strategyId]
+  );
 
   useEffect(() => {
     if (!strategyId) {
@@ -273,15 +284,6 @@ function StrategyDetailPage() {
           }));
         }
 
-        if (existingTradingLimit) {
-          setAutoTradingForm((previous) => ({
-            ...previous,
-            dailyMaxOrderAmount: String(existingTradingLimit.dailyMaxOrderAmount),
-            dailyMaxOrderCount: String(existingTradingLimit.dailyMaxOrderCount),
-            dailyLossLimitRate: String(existingTradingLimit.dailyLossLimitRate),
-          }));
-        }
-
         /*
          * 전략이 수정된 경우 서버에 남아 있는 기존 백테스트와
          * AI 분석은 현재 전략의 검증 결과로 사용하지 않는다.
@@ -290,9 +292,57 @@ function StrategyDetailPage() {
          * 계속 조회할 수 있다.
          */
         if (validationRequired) {
-          setLatestBacktest(null);
-          setAiAnalysis(null);
-          setIsBacktestFormOpen(true);
+          const validationState = getStrategyValidationState(strategyId);
+
+          if (!validationState?.backtestId) {
+            setLatestBacktest(null);
+            setAiAnalysis(null);
+            setIsBacktestFormOpen(true);
+            return;
+          }
+
+          const revalidationBacktest = await getBacktestDetail(
+            strategyId,
+            validationState.backtestId
+          );
+
+          if (cancelled) {
+            return;
+          }
+
+          setLatestBacktest(revalidationBacktest);
+          setIsBacktestFormOpen(false);
+
+          if (
+            revalidationBacktest.status === 'REQUESTED' ||
+            revalidationBacktest.status === 'RUNNING'
+          ) {
+            void pollBacktest(revalidationBacktest.backtestId);
+            return;
+          }
+
+          if (revalidationBacktest.status === 'COMPLETED') {
+            const existingAnalysis = await findExistingAnalysis(
+              strategyId,
+              revalidationBacktest.backtestId
+            );
+
+            if (cancelled) {
+              return;
+            }
+
+            if (existingAnalysis) {
+              setAiAnalysis(existingAnalysis);
+
+              if (existingAnalysis.status === 'PENDING') {
+                void pollAiAnalysis(existingAnalysis.analysisId);
+              } else if (existingAnalysis.status === 'COMPLETED') {
+                completeStrategyRevalidation(strategyId);
+                setRequiresRevalidation(false);
+              }
+            }
+          }
+
           return;
         }
 
@@ -357,7 +407,14 @@ function StrategyDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [strategyId]);
+  }, [
+    strategyId,
+    findExistingAnalysis,
+    findExistingAutoTrading,
+    loadTradingLimit,
+    pollAiAnalysis,
+    pollBacktest,
+  ]);
 
   const handleBacktestSubmit = async () => {
     if (!strategyId || isBacktestSubmitting) {
@@ -399,8 +456,7 @@ function StrategyDetailPage() {
 
       if (firstResult.status === 'COMPLETED') {
         if (needsStrategyRevalidation(strategyId)) {
-          completeStrategyRevalidation(strategyId);
-          setRequiresRevalidation(false);
+          setRevalidationBacktest(strategyId, firstResult.backtestId);
         }
 
         setIsBacktestSubmitting(false);
@@ -422,13 +478,7 @@ function StrategyDetailPage() {
   };
 
   const handleAiAnalysis = async () => {
-    if (
-      !strategyId ||
-      requiresRevalidation ||
-      !latestBacktest ||
-      latestBacktest.status !== 'COMPLETED' ||
-      isAiSubmitting
-    ) {
+    if (!strategyId || !latestBacktest || latestBacktest.status !== 'COMPLETED' || isAiSubmitting) {
       return;
     }
 
@@ -446,6 +496,15 @@ function StrategyDetailPage() {
       setAiAnalysis(firstResult);
 
       if (firstResult.status === 'COMPLETED') {
+        if (needsStrategyRevalidation(strategyId)) {
+          const validationState = getStrategyValidationState(strategyId);
+
+          if (validationState?.backtestId === latestBacktest.backtestId) {
+            completeStrategyRevalidation(strategyId);
+            setRequiresRevalidation(false);
+          }
+        }
+
         setIsAiSubmitting(false);
         return;
       }
@@ -479,6 +538,11 @@ function StrategyDetailPage() {
       return;
     }
 
+    if (!autoTrading?.enabled) {
+      setStrategyActivationError('전략 감지를 시작하려면 먼저 자동매매를 활성화해주세요.');
+      return;
+    }
+
     try {
       setIsStrategyActivating(true);
       setStrategyActivationError('');
@@ -505,11 +569,6 @@ function StrategyDetailPage() {
       return;
     }
 
-    if (autoTrading?.enabled) {
-      setStrategyActivationError('자동매매를 중지한 후 전략을 비활성화할 수 있습니다.');
-      return;
-    }
-
     try {
       setIsStrategyActivating(true);
       setStrategyActivationError('');
@@ -531,37 +590,9 @@ function StrategyDetailPage() {
     }
   };
 
-  const validateAutoTradingForm = () => {
-    const dailyMaxOrderAmount = Number(autoTradingForm.dailyMaxOrderAmount);
-    const dailyMaxOrderCount = Number(autoTradingForm.dailyMaxOrderCount);
-    const dailyLossLimitRate = Number(autoTradingForm.dailyLossLimitRate);
-
-    if (!Number.isFinite(dailyMaxOrderAmount) || dailyMaxOrderAmount <= 0) {
-      setAutoTradingError('일 최대 주문 금액을 확인해주세요.');
-      return null;
-    }
-
-    if (!Number.isInteger(dailyMaxOrderCount) || dailyMaxOrderCount <= 0) {
-      setAutoTradingError('일 최대 주문 횟수를 확인해주세요.');
-      return null;
-    }
-
-    if (!Number.isFinite(dailyLossLimitRate) || dailyLossLimitRate <= 0) {
-      setAutoTradingError('일 손실 한도를 확인해주세요.');
-      return null;
-    }
-
-    return {
-      dailyMaxOrderAmount,
-      dailyMaxOrderCount,
-      dailyLossLimitRate,
-    };
-  };
-
   const handleAutoTradingStart = async () => {
     if (
       !strategyId ||
-      !strategy ||
       requiresRevalidation ||
       latestBacktest?.status !== 'COMPLETED' ||
       aiAnalysis?.status !== 'COMPLETED' ||
@@ -570,30 +601,16 @@ function StrategyDetailPage() {
       return;
     }
 
-    if (strategy.status !== 'ACTIVE') {
-      setAutoTradingError('활성화된 전략만 자동매매를 시작할 수 있습니다.');
-      return;
-    }
-
-    const limitValues = validateAutoTradingForm();
-
-    if (!limitValues) {
+    if (!tradingLimit) {
+      setAutoTradingError(
+        '자동매매를 활성화하려면 먼저 내 계좌에서 공통 거래 한도를 설정해주세요.'
+      );
       return;
     }
 
     try {
       setIsAutoTradingSubmitting(true);
       setAutoTradingError('');
-
-      let currentLimit = tradingLimit;
-
-      if (currentLimit) {
-        currentLimit = await updateTradingLimit(limitValues);
-      } else {
-        currentLimit = await createTradingLimit(limitValues);
-      }
-
-      setTradingLimit(currentLimit);
 
       let currentAutoTrading = autoTrading;
 
@@ -616,8 +633,10 @@ function StrategyDetailPage() {
       }
 
       setAutoTrading(currentAutoTrading);
+      setIsTradingLimitRequired(false);
     } catch (error) {
-      setAutoTradingError(getErrorMessage(error, '자동매매를 시작하지 못했습니다.'));
+      setAutoTradingError(getErrorMessage(error, '자동매매를 활성화하지 못했습니다.'));
+      setIsTradingLimitRequired(false);
     } finally {
       setIsAutoTradingSubmitting(false);
     }
@@ -625,6 +644,11 @@ function StrategyDetailPage() {
 
   const handleAutoTradingStop = async () => {
     if (!autoTrading || isAutoTradingSubmitting) {
+      return;
+    }
+
+    if (strategy?.status === 'ACTIVE') {
+      setAutoTradingError('전략 감지를 먼저 중지한 후 자동매매를 중지해주세요.');
       return;
     }
 
@@ -666,7 +690,7 @@ function StrategyDetailPage() {
     );
   }
 
-  const isBacktestCompleted = !requiresRevalidation && latestBacktest?.status === 'COMPLETED';
+  const isBacktestCompleted = latestBacktest?.status === 'COMPLETED';
 
   const isAiCompleted = !requiresRevalidation && aiAnalysis?.status === 'COMPLETED';
 
@@ -745,15 +769,15 @@ function StrategyDetailPage() {
           <VerificationLine />
 
           <VerificationStep
-            label="전략 활성화"
-            state={isStrategyActive ? 'complete' : isAiCompleted ? 'current' : 'pending'}
+            label="자동매매"
+            state={isAutoTradingEnabled ? 'complete' : isAiCompleted ? 'current' : 'pending'}
           />
 
           <VerificationLine />
 
           <VerificationStep
-            label="자동매매"
-            state={isAutoTradingEnabled ? 'complete' : isStrategyActive ? 'current' : 'pending'}
+            label="전략 감지"
+            state={isStrategyActive ? 'complete' : isAutoTradingEnabled ? 'current' : 'pending'}
           />
         </div>
       </section>
@@ -825,11 +849,7 @@ function StrategyDetailPage() {
               <p>결과를 기반으로 전략의 위험 수준과 주요 위험 요인을 분석해보세요.</p>
             </div>
 
-            <button
-              type="button"
-              disabled={isAiSubmitting || requiresRevalidation}
-              onClick={() => void handleAiAnalysis()}
-            >
+            <button type="button" disabled={isAiSubmitting} onClick={() => void handleAiAnalysis()}>
               {isAiSubmitting ? '분석 요청 중...' : '위험 분석 시작'}
             </button>
           </div>
@@ -853,7 +873,7 @@ function StrategyDetailPage() {
 
               <button
                 type="button"
-                disabled={isAiSubmitting || requiresRevalidation}
+                disabled={isAiSubmitting}
                 onClick={() => void handleAiAnalysis()}
               >
                 다시 분석
@@ -876,105 +896,119 @@ function StrategyDetailPage() {
         <div className="strategy-detail__section-header">
           <div>
             <h2>자동매매</h2>
-            <p>활성화된 전략에 매매 방향과 거래 한도를 설정하고 자동매매를 시작합니다.</p>
+            <p>매매 신호가 발생했을 때 주문할 수 있도록 자동매매를 준비합니다.</p>
           </div>
 
           {isAutoTradingEnabled && (
             <span className="strategy-detail__running">
               <span />
-              실행 중
+              준비 완료
             </span>
           )}
         </div>
 
         {!isAiCompleted ? (
           <div className="strategy-detail__locked">
-            <strong>위험 분석 완료 후 전략을 활성화할 수 있습니다.</strong>
-            <p>백테스트와 AI 위험 분석 결과를 먼저 확인해주세요.</p>
+            <strong>위험 분석 완료 후 자동매매를 활성화할 수 있습니다.</strong>
+            <p>백테스트와 AI 위험 분석을 먼저 완료해주세요.</p>
           </div>
-        ) : !isStrategyActive ? (
-          <div className="strategy-detail__locked">
-            <strong>자동매매를 사용하려면 전략 활성화가 필요합니다.</strong>
-
-            <p>백테스트와 위험 분석 결과를 확인했다면 이 전략을 활성화할 수 있습니다.</p>
-
-            <button
-              type="button"
-              className="strategy-detail__primary-button"
-              disabled={isStrategyActivating || requiresRevalidation}
-              onClick={() => void handleStrategyActivation()}
-            >
-              {isStrategyActivating ? (
-                <>
-                  <LoaderCircle className="strategy-detail__spinner" size={17} />
-                  활성화 중
-                </>
-              ) : (
-                '전략 활성화'
-              )}
-            </button>
-
-            {strategyActivationError && (
-              <p className="strategy-detail__inline-error">{strategyActivationError}</p>
-            )}
-          </div>
-        ) : isAutoTradingEnabled ? (
+        ) : isAutoTradingEnabled && tradingLimit ? (
           <AutoTradingActiveSection
             autoTrading={autoTrading}
             tradingLimit={tradingLimit}
+            isStrategyActive={isStrategyActive}
             isSubmitting={isAutoTradingSubmitting}
             error={autoTradingError}
             onStop={() => void handleAutoTradingStop()}
             onOrders={() => navigate('/orders')}
+            onLimit={() => navigate('/account')}
           />
         ) : (
           <AutoTradingSetupSection
             form={autoTradingForm}
             setForm={setAutoTradingForm}
+            tradingLimit={tradingLimit}
             isSubmitting={isAutoTradingSubmitting}
             error={autoTradingError}
+            isTradingLimitRequired={isTradingLimitRequired}
             hasExistingAutoTrading={autoTrading !== null}
+            onLimitSettings={() => navigate('/account')}
             onSubmit={() => void handleAutoTradingStart()}
+            onLimit={() => navigate('/account')}
           />
         )}
       </section>
 
-      {isStrategyActive && (
-        <section className="strategy-detail__deactivation">
-          <div className="strategy-detail__deactivation-info">
-            <strong>전략 비활성화</strong>
+      {isAutoTradingEnabled && (
+        <section
+          className="strategy-detail__section strategy-detail__monitoring"
+          id="strategy-monitoring"
+        >
+          <div className="strategy-detail__section-header">
+            <div>
+              <h2>전략 감지</h2>
+              <p>실시간 시세를 기준으로 전략의 매수·매도 조건을 감지합니다.</p>
+            </div>
 
-            <p>
-              전략을 비활성화하면 더 이상 자동매매에 사용할 수 없습니다. 다시 사용하려면 전략을
-              활성화해야 합니다.
-            </p>
-
-            {isAutoTradingEnabled && (
-              <p className="strategy-detail__deactivation-warning">
-                자동매매가 실행 중입니다. 먼저 자동매매를 중지해주세요.
-              </p>
-            )}
-
-            {strategyActivationError && (
-              <p className="strategy-detail__inline-error">{strategyActivationError}</p>
+            {isStrategyActive && (
+              <span className="strategy-detail__running">
+                <span />
+                감지 중
+              </span>
             )}
           </div>
 
-          <button
-            type="button"
-            className="strategy-detail__deactivate-button"
-            disabled={isStrategyActivating || isAutoTradingEnabled}
-            onClick={() => void handleStrategyDeactivation()}
-          >
-            {isStrategyActivating ? (
-              <>
-                <LoaderCircle className="strategy-detail__spinner" size={16} />
-                비활성화 중
-              </>
-            ) : (
-              '전략 비활성화'
-            )}
-          </button>
+          {!isStrategyActive ? (
+            <div className="strategy-detail__locked">
+              <strong>자동매매 준비가 완료되었습니다.</strong>
+              <p>전략을 활성화하면 실시간 시세를 기준으로 매매 조건 감지를 시작합니다.</p>
+
+              <button
+                type="button"
+                className="strategy-detail__primary-button"
+                disabled={isStrategyActivating || requiresRevalidation}
+                onClick={() => void handleStrategyActivation()}
+              >
+                {isStrategyActivating ? (
+                  <>
+                    <LoaderCircle className="strategy-detail__spinner" size={17} />
+                    활성화 중
+                  </>
+                ) : (
+                  '전략 활성화'
+                )}
+              </button>
+
+              {strategyActivationError && (
+                <p className="strategy-detail__inline-error">{strategyActivationError}</p>
+              )}
+            </div>
+          ) : (
+            <div className="strategy-detail__monitoring-active">
+              <div>
+                <strong>실시간 전략 감지 중</strong>
+                <p>
+                  조건이 충족되면 매매 신호가 생성되고, 설정된 공통 한도 내에서 주문이 실행됩니다.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="strategy-detail__deactivate-button"
+                disabled={isStrategyActivating}
+                onClick={() => void handleStrategyDeactivation()}
+              >
+                {isStrategyActivating ? (
+                  <>
+                    <LoaderCircle className="strategy-detail__spinner" size={16} />
+                    중지 중
+                  </>
+                ) : (
+                  '전략 비활성화'
+                )}
+              </button>
+            </div>
+          )}
         </section>
       )}
     </main>
@@ -1206,17 +1240,25 @@ function AiAnalysisResult({
 function AutoTradingSetupSection({
   form,
   setForm,
+  tradingLimit,
   isSubmitting,
   error,
+  isTradingLimitRequired,
   hasExistingAutoTrading,
   onSubmit,
+  onLimit,
+  onLimitSettings,
 }: {
   form: AutoTradingForm;
   setForm: React.Dispatch<React.SetStateAction<AutoTradingForm>>;
+  tradingLimit: TradingLimit | null;
   isSubmitting: boolean;
   error: string;
+  isTradingLimitRequired: boolean;
   hasExistingAutoTrading: boolean;
   onSubmit: () => void;
+  onLimit: () => void;
+  onLimitSettings: () => void;
 }) {
   return (
     <div className="strategy-detail__auto-setup">
@@ -1265,99 +1307,80 @@ function AutoTradingSetupSection({
         </div>
       </div>
 
-      <div className="strategy-detail__auto-block">
-        <div className="strategy-detail__auto-block-header">
-          <span className="strategy-detail__auto-label">거래 한도</span>
-          <p>자동 주문이 하루 동안 사용할 수 있는 범위를 설정합니다.</p>
+      {tradingLimit && <CommonTradingLimit tradingLimit={tradingLimit} onLimit={onLimit} />}
+
+      {error && (
+        <div className="strategy-detail__auto-error">
+          <span>{error}</span>
+
+          {isTradingLimitRequired && (
+            <button type="button" onClick={onLimitSettings}>
+              한도 설정하러 가기
+              <ChevronRight size={13} />
+            </button>
+          )}
         </div>
-
-        <div className="strategy-detail__limit-grid">
-          <label>
-            <span>일 최대 주문 금액</span>
-
-            <div className="strategy-detail__unit-input">
-              <input
-                type="number"
-                min="1"
-                value={form.dailyMaxOrderAmount}
-                disabled={isSubmitting}
-                onChange={(event) =>
-                  setForm((previous) => ({
-                    ...previous,
-                    dailyMaxOrderAmount: event.target.value,
-                  }))
-                }
-              />
-              <span>원</span>
-            </div>
-          </label>
-
-          <label>
-            <span>일 최대 주문 횟수</span>
-
-            <div className="strategy-detail__unit-input">
-              <input
-                type="number"
-                min="1"
-                step="1"
-                value={form.dailyMaxOrderCount}
-                disabled={isSubmitting}
-                onChange={(event) =>
-                  setForm((previous) => ({
-                    ...previous,
-                    dailyMaxOrderCount: event.target.value,
-                  }))
-                }
-              />
-              <span>회</span>
-            </div>
-          </label>
-
-          <label>
-            <span>일 손실 한도</span>
-
-            <div className="strategy-detail__unit-input">
-              <input
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={form.dailyLossLimitRate}
-                disabled={isSubmitting}
-                onChange={(event) =>
-                  setForm((previous) => ({
-                    ...previous,
-                    dailyLossLimitRate: event.target.value,
-                  }))
-                }
-              />
-              <span>%</span>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      {error && <p className="strategy-detail__inline-error">{error}</p>}
+      )}
 
       <div className="strategy-detail__auto-submit">
         <div>
           <strong>
             {hasExistingAutoTrading
-              ? '중지된 자동매매를 다시 시작합니다.'
-              : '자동매매를 시작할 준비가 되었습니다.'}
+              ? '중지된 자동매매를 다시 준비합니다.'
+              : '자동매매를 활성화할 준비가 되었습니다.'}
           </strong>
-          <p>설정한 전략 조건과 거래 한도에 따라 주문이 실행될 수 있습니다.</p>
+
+          <p>활성화 후 전략 감지를 시작하기 전까지는 주문이 발생하지 않습니다.</p>
         </div>
 
         <button type="button" disabled={isSubmitting} onClick={onSubmit}>
           {isSubmitting ? (
             <>
               <LoaderCircle className="strategy-detail__spinner" size={17} />
-              설정 중...
+              활성화 중...
             </>
           ) : (
-            '자동매매 시작'
+            '자동매매 활성화'
           )}
         </button>
+      </div>
+    </div>
+  );
+}
+
+function CommonTradingLimit({
+  tradingLimit,
+  onLimit,
+}: {
+  tradingLimit: TradingLimit;
+  onLimit: () => void;
+}) {
+  return (
+    <div className="strategy-detail__common-limit">
+      <div className="strategy-detail__common-limit-header">
+        <div>
+          <strong>공통 거래 한도</strong>
+          <p>모든 자동매매 전략에 공통으로 적용됩니다.</p>
+        </div>
+
+        <button type="button" onClick={onLimit}>
+          한도 변경
+        </button>
+      </div>
+
+      <div className="strategy-detail__common-limit-values">
+        <AutoTradingValue
+          label="일 최대 주문 금액"
+          value={formatWon(tradingLimit.dailyMaxOrderAmount)}
+        />
+        <AutoTradingValue
+          label="일 최대 주문 횟수"
+          value={`${tradingLimit.dailyMaxOrderCount.toLocaleString('ko-KR')}회`}
+        />
+        <AutoTradingValue
+          label="일 손실 한도"
+          value={`${tradingLimit.dailyLossLimitRate.toLocaleString('ko-KR')}%`}
+        />
       </div>
     </div>
   );
@@ -1404,40 +1427,29 @@ function DirectionOption({
 function AutoTradingActiveSection({
   autoTrading,
   tradingLimit,
+  isStrategyActive,
   isSubmitting,
   error,
   onStop,
   onOrders,
+  onLimit,
 }: {
   autoTrading: AutoTrading;
-  tradingLimit: TradingLimit | null;
+  tradingLimit: TradingLimit;
+  isStrategyActive: boolean;
   isSubmitting: boolean;
   error: string;
   onStop: () => void;
   onOrders: () => void;
+  onLimit: () => void;
 }) {
   return (
     <div className="strategy-detail__auto-active">
-      <div className="strategy-detail__auto-values">
+      <div className="strategy-detail__auto-values strategy-detail__auto-values--single">
         <AutoTradingValue label="매매 방향" value={getDirectionLabel(autoTrading.direction)} />
-
-        <AutoTradingValue
-          label="일 최대 주문 금액"
-          value={tradingLimit ? formatWon(tradingLimit.dailyMaxOrderAmount) : '-'}
-        />
-
-        <AutoTradingValue
-          label="일 최대 주문 횟수"
-          value={
-            tradingLimit ? `${tradingLimit.dailyMaxOrderCount.toLocaleString('ko-KR')}회` : '-'
-          }
-        />
-
-        <AutoTradingValue
-          label="일 손실 한도"
-          value={tradingLimit ? `${tradingLimit.dailyLossLimitRate.toLocaleString('ko-KR')}%` : '-'}
-        />
       </div>
+
+      <CommonTradingLimit tradingLimit={tradingLimit} onLimit={onLimit} />
 
       <div className="strategy-detail__latest-order">
         <span>최근 주문</span>
@@ -1471,12 +1483,18 @@ function AutoTradingActiveSection({
         <button
           type="button"
           className="strategy-detail__stop-button"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isStrategyActive}
           onClick={onStop}
         >
           {isSubmitting ? '중지 중...' : '자동매매 중지'}
         </button>
       </div>
+
+      {isStrategyActive && (
+        <p className="strategy-detail__auto-stop-guide">
+          자동매매를 중지하려면 먼저 아래에서 전략 감지를 중지해주세요.
+        </p>
+      )}
     </div>
   );
 }

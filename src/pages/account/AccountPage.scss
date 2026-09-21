@@ -722,6 +722,249 @@
   }
 
   // ─────────────────────────────────────
+  // Trading limit
+  // ─────────────────────────────────────
+
+  &__limit-header {
+    align-items: center;
+  }
+
+  &__limit-status {
+    display: inline-flex;
+    height: 26px;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 5px;
+    padding: 0 9px;
+    color: $color-primary-hover;
+    font-size: 10px;
+    font-weight: 700;
+    background: rgb(22 199 132 / 7%);
+    border-radius: 999px;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &__limit-loading {
+    display: flex;
+    min-height: 120px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: $color-gray-500;
+    font-size: 12px;
+
+    .account-page__spinner {
+      color: $color-primary;
+    }
+  }
+
+  &__limit-guide {
+    margin-bottom: 22px;
+    padding: 14px 16px;
+    background: $color-gray-50;
+    border: 1px solid $color-gray-100;
+    border-radius: $radius-sm;
+
+    strong {
+      display: block;
+      color: $color-gray-700;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    p {
+      margin: 6px 0 0;
+      color: $color-gray-500;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+  }
+
+  &__limit-form {
+    width: 100%;
+  }
+
+  &__limit-fields,
+  &__limit-values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  &__limit-fields {
+    > label {
+      min-width: 0;
+
+      > span {
+        display: block;
+        margin-bottom: 8px;
+        color: $color-gray-500;
+        font-size: 12px;
+        font-weight: 650;
+      }
+    }
+  }
+
+  &__limit-input {
+    display: flex;
+    width: 100%;
+    height: 44px;
+    align-items: center;
+    background: $color-white;
+    border: 1px solid $color-gray-300;
+    border-radius: $radius-sm;
+
+    &:focus-within {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgb(22 199 132 / 8%);
+    }
+
+    input {
+      min-width: 0;
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      padding: 0 13px;
+      color: $color-gray-900;
+      background: transparent;
+      border: 0;
+      outline: none;
+
+      &::placeholder {
+        color: $color-gray-400;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        margin: 0;
+        appearance: none;
+      }
+    }
+
+    > span {
+      flex-shrink: 0;
+      padding-right: 13px;
+      color: $color-gray-400;
+      font-size: 11px;
+    }
+  }
+
+  &__limit-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 22px;
+
+    > span {
+      color: $color-gray-400;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    > div {
+      display: flex;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+  }
+
+  &__limit-summary {
+    width: 100%;
+  }
+
+  &__limit-values {
+    padding: 4px 0 25px;
+
+    > div {
+      min-width: 0;
+
+      > span {
+        display: block;
+        margin-bottom: 8px;
+        color: $color-gray-500;
+        font-size: 12px;
+      }
+
+      > strong {
+        display: block;
+        overflow: hidden;
+        color: $color-gray-900;
+        font-size: 16px;
+        font-weight: 650;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &__limit-summary-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 18px;
+    border-top: 1px solid $color-gray-100;
+
+    > span {
+      color: $color-gray-400;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    > button {
+      flex-shrink: 0;
+    }
+  }
+
+  &__limit-message {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 14px;
+    font-size: 11px;
+    line-height: 1.5;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    > span {
+      flex: 1;
+    }
+
+    > button {
+      flex-shrink: 0;
+      padding: 0;
+      font-size: 11px;
+      font-weight: 700;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+
+    &--error {
+      color: $color-rise;
+
+      > button {
+        color: $color-rise;
+      }
+    }
+
+    &--success {
+      color: $color-primary-hover;
+      font-weight: 650;
+    }
+  }
+
+  // ─────────────────────────────────────
   // Connected account
   // ─────────────────────────────────────
 
@@ -906,6 +1149,11 @@
   @include tablet {
     &__asset-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__limit-fields,
+    &__limit-values {
+      gap: 14px;
     }
 
     &__holding-head,
@@ -1103,6 +1351,70 @@
       display: block;
       color: $color-gray-300;
       transform: translateY(-50%);
+    }
+
+    // Trading limit
+
+    &__limit-header {
+      align-items: flex-start;
+    }
+
+    &__limit-fields,
+    &__limit-values {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    &__limit-values {
+      padding-bottom: 21px;
+
+      > div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+
+        > span {
+          margin-bottom: 0;
+        }
+
+        > strong {
+          flex-shrink: 0;
+          font-size: 14px;
+          text-align: right;
+        }
+      }
+    }
+
+    &__limit-actions,
+    &__limit-summary-footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+
+      > div {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        button {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+
+      > button {
+        width: 100%;
+      }
+    }
+
+    &__limit-actions {
+      > span {
+        order: 2;
+      }
+
+      > div {
+        order: 1;
+      }
     }
 
     // Connected account

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   AlertCircle,
   Check,
@@ -22,6 +23,7 @@ import {
   getAccountHoldings,
   getMyAccount,
 } from '../../api/account';
+import { createTradingLimit, getTradingLimit, updateTradingLimit } from '../../api/autoTrading';
 
 import type {
   Account,
@@ -31,6 +33,7 @@ import type {
   AccountHoldings,
   AccountType,
 } from '../../types/account';
+import type { TradingLimit } from '../../types/autoTrading';
 
 import './AccountPage.scss';
 
@@ -89,6 +92,21 @@ const getErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+const isTradingLimitNotFoundError = (error: unknown) => {
+  if (!axios.isAxiosError(error)) {
+    return false;
+  }
+
+  const data = error.response?.data;
+
+  return (
+    data !== null &&
+    typeof data === 'object' &&
+    'errorCode' in data &&
+    data.errorCode === 'AUTO_TRADING_0003'
+  );
+};
+
 const AccountPage = () => {
   const navigate = useNavigate();
 
@@ -108,6 +126,17 @@ const AccountPage = () => {
 
   const [holdingsAsOf, setHoldingsAsOf] = useState<string | null>(null);
 
+  const [tradingLimit, setTradingLimit] = useState<TradingLimit | null>(null);
+  const [isTradingLimitLoading, setIsTradingLimitLoading] = useState(false);
+  const [isTradingLimitEditing, setIsTradingLimitEditing] = useState(false);
+  const [isTradingLimitSaving, setIsTradingLimitSaving] = useState(false);
+  const [tradingLimitError, setTradingLimitError] = useState('');
+  const [tradingLimitSuccess, setTradingLimitSuccess] = useState('');
+
+  const [dailyMaxOrderAmount, setDailyMaxOrderAmount] = useState('');
+  const [dailyMaxOrderCount, setDailyMaxOrderCount] = useState('');
+  const [dailyLossLimitRate, setDailyLossLimitRate] = useState('');
+
   const [isLoading, setIsLoading] = useState(true);
   const [isAssetLoading, setIsAssetLoading] = useState(false);
   const [isMoreLoading, setIsMoreLoading] = useState(false);
@@ -126,6 +155,19 @@ const AccountPage = () => {
   const [secretKey, setSecretKey] = useState('');
   const [accountNo, setAccountNo] = useState('');
   const [accountType, setAccountType] = useState<AccountType>('VIRTUAL');
+
+  const syncTradingLimitForm = useCallback((limit: TradingLimit | null) => {
+    if (!limit) {
+      setDailyMaxOrderAmount('');
+      setDailyMaxOrderCount('');
+      setDailyLossLimitRate('');
+      return;
+    }
+
+    setDailyMaxOrderAmount(String(limit.dailyMaxOrderAmount));
+    setDailyMaxOrderCount(String(limit.dailyMaxOrderCount));
+    setDailyLossLimitRate(String(limit.dailyLossLimitRate));
+  }, []);
 
   /**
    * 계좌의 예수금 + 보유종목 데이터를 조회한다.
@@ -155,10 +197,37 @@ const AccountPage = () => {
   }, []);
 
   /**
-   * 최초 페이지 진입 시 계좌 연결 여부를 조회한다.
+   * 사용자 공통 자동매매 한도를 조회한다.
    *
-   * isLoading의 초기값이 true이므로
-   * useEffect 경로에서 다시 setIsLoading(true)를 호출하지 않는다.
+   * AUTO_TRADING_0003은 오류 화면을 보여줄 상황이 아니라
+   * 아직 한도가 설정되지 않은 정상 상태로 처리한다.
+   */
+  const loadTradingLimit = useCallback(async () => {
+    try {
+      setIsTradingLimitLoading(true);
+      setTradingLimitError('');
+
+      const response = await getTradingLimit();
+
+      setTradingLimit(response);
+      syncTradingLimitForm(response);
+      setIsTradingLimitEditing(false);
+    } catch (error) {
+      if (isTradingLimitNotFoundError(error)) {
+        setTradingLimit(null);
+        syncTradingLimitForm(null);
+        setIsTradingLimitEditing(true);
+        return;
+      }
+
+      setTradingLimitError(getErrorMessage(error, '자동매매 공통 한도를 불러오지 못했습니다.'));
+    } finally {
+      setIsTradingLimitLoading(false);
+    }
+  }, [syncTradingLimitForm]);
+
+  /**
+   * 최초 페이지 진입 시 계좌 연결 여부를 조회한다.
    */
   const loadPage = useCallback(async () => {
     try {
@@ -170,6 +239,9 @@ const AccountPage = () => {
         setDeposit(null);
         setHoldings([]);
         setHoldingsAsOf(null);
+        setTradingLimit(null);
+        syncTradingLimitForm(null);
+
         setHoldingsCursor({
           hasNext: false,
           fk100: null,
@@ -179,13 +251,13 @@ const AccountPage = () => {
         return;
       }
 
-      await loadAssets();
+      await Promise.all([loadAssets(), loadTradingLimit()]);
     } catch (error) {
       setPageError(getErrorMessage(error, '계좌 정보를 불러오지 못했습니다.'));
     } finally {
       setIsLoading(false);
     }
-  }, [loadAssets]);
+  }, [loadAssets, loadTradingLimit, syncTradingLimitForm]);
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
@@ -197,11 +269,6 @@ const AccountPage = () => {
     };
   }, [loadPage]);
 
-  /**
-   * 페이지 자체 조회 실패 후 사용자가 누르는 재시도.
-   *
-   * 사용자 액션이므로 여기서는 loading state를 직접 변경한다.
-   */
   const handleRetryPage = async () => {
     setIsLoading(true);
     setPageError('');
@@ -210,9 +277,6 @@ const AccountPage = () => {
     await loadPage();
   };
 
-  /**
-   * 연결된 계좌의 자산 데이터만 다시 조회한다.
-   */
   const handleRefresh = async () => {
     if (!account || isAssetLoading) {
       return;
@@ -228,9 +292,6 @@ const AccountPage = () => {
     }
   };
 
-  /**
-   * 자산 영역에서 오류가 발생했을 때 다시 조회한다.
-   */
   const handleRetryAssets = async () => {
     if (!account || isAssetLoading) {
       return;
@@ -306,7 +367,7 @@ const AccountPage = () => {
       setShowSecretKey(false);
       setShowConnectionForm(false);
 
-      await loadAssets();
+      await Promise.all([loadAssets(), loadTradingLimit()]);
     } catch (error) {
       setFormError(getErrorMessage(error, '계좌를 연결하지 못했습니다. 입력 정보를 확인해주세요.'));
     } finally {
@@ -349,6 +410,82 @@ const AccountPage = () => {
     }
   };
 
+  const handleTradingLimitEdit = () => {
+    syncTradingLimitForm(tradingLimit);
+    setTradingLimitError('');
+    setTradingLimitSuccess('');
+    setIsTradingLimitEditing(true);
+  };
+
+  const handleTradingLimitCancel = () => {
+    if (!tradingLimit) {
+      return;
+    }
+
+    syncTradingLimitForm(tradingLimit);
+    setTradingLimitError('');
+    setTradingLimitSuccess('');
+    setIsTradingLimitEditing(false);
+  };
+
+  const handleTradingLimitSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (isTradingLimitSaving) {
+      return;
+    }
+
+    const maxOrderAmount = Number(dailyMaxOrderAmount);
+    const maxOrderCount = Number(dailyMaxOrderCount);
+    const lossLimitRate = Number(dailyLossLimitRate);
+
+    if (
+      !Number.isFinite(maxOrderAmount) ||
+      !Number.isInteger(maxOrderAmount) ||
+      maxOrderAmount <= 0
+    ) {
+      setTradingLimitError('일 최대 주문 금액은 0보다 큰 정수로 입력해주세요.');
+      return;
+    }
+
+    if (!Number.isFinite(maxOrderCount) || !Number.isInteger(maxOrderCount) || maxOrderCount <= 0) {
+      setTradingLimitError('일 최대 주문 횟수는 0보다 큰 정수로 입력해주세요.');
+      return;
+    }
+
+    if (!Number.isFinite(lossLimitRate) || lossLimitRate <= 0) {
+      setTradingLimitError('일 손실 한도는 0보다 큰 값으로 입력해주세요.');
+      return;
+    }
+
+    try {
+      setIsTradingLimitSaving(true);
+      setTradingLimitError('');
+      setTradingLimitSuccess('');
+
+      const request = {
+        dailyMaxOrderAmount: maxOrderAmount,
+        dailyMaxOrderCount: maxOrderCount,
+        dailyLossLimitRate: lossLimitRate,
+      };
+
+      const savedLimit = tradingLimit
+        ? await updateTradingLimit(request)
+        : await createTradingLimit(request);
+
+      setTradingLimit(savedLimit);
+      syncTradingLimitForm(savedLimit);
+      setIsTradingLimitEditing(false);
+      setTradingLimitSuccess(
+        tradingLimit ? '자동매매 공통 한도를 변경했습니다.' : '자동매매 공통 한도를 설정했습니다.'
+      );
+    } catch (error) {
+      setTradingLimitError(getErrorMessage(error, '자동매매 공통 한도를 저장하지 못했습니다.'));
+    } finally {
+      setIsTradingLimitSaving(false);
+    }
+  };
+
   const handleDisconnect = async () => {
     if (!account || isDeleting) {
       return;
@@ -373,6 +510,11 @@ const AccountPage = () => {
       setHoldings([]);
       setHoldingsAsOf(null);
       setAssetError('');
+      setTradingLimit(null);
+      setTradingLimitError('');
+      setTradingLimitSuccess('');
+      setIsTradingLimitEditing(false);
+      syncTradingLimitForm(null);
 
       setHoldingsCursor({
         hasNext: false,
@@ -834,6 +976,193 @@ const AccountPage = () => {
               </div>
             )}
           </>
+        )}
+      </section>
+
+      <section className="account-page__section">
+        <div className="account-page__section-header account-page__limit-header">
+          <div>
+            <h2>자동매매 공통 한도</h2>
+            <p>모든 자동매매 전략에 공통으로 적용되는 주문 한도입니다.</p>
+          </div>
+
+          {tradingLimit && !isTradingLimitEditing && (
+            <span className="account-page__limit-status">
+              <Check size={12} />
+              설정됨
+            </span>
+          )}
+        </div>
+
+        {isTradingLimitLoading ? (
+          <div className="account-page__limit-loading">
+            <LoaderCircle className="account-page__spinner" size={18} />
+            <span>공통 한도를 불러오는 중입니다.</span>
+          </div>
+        ) : isTradingLimitEditing || !tradingLimit ? (
+          <form
+            className="account-page__limit-form"
+            onSubmit={(event) => void handleTradingLimitSubmit(event)}
+          >
+            {!tradingLimit && (
+              <div className="account-page__limit-guide">
+                <strong>자동매매를 시작하기 전에 공통 한도를 설정해주세요.</strong>
+                <p>
+                  설정한 한도는 개별 전략이 아닌 계정의 모든 자동매매 전략에 동일하게 적용됩니다.
+                </p>
+              </div>
+            )}
+
+            <div className="account-page__limit-fields">
+              <label>
+                <span>일 최대 주문 금액</span>
+
+                <div className="account-page__limit-input">
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputMode="numeric"
+                    placeholder="5000000"
+                    value={dailyMaxOrderAmount}
+                    disabled={isTradingLimitSaving}
+                    onChange={(event) => setDailyMaxOrderAmount(event.target.value)}
+                  />
+                  <span>원</span>
+                </div>
+              </label>
+
+              <label>
+                <span>일 최대 주문 횟수</span>
+
+                <div className="account-page__limit-input">
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputMode="numeric"
+                    placeholder="10"
+                    value={dailyMaxOrderCount}
+                    disabled={isTradingLimitSaving}
+                    onChange={(event) => setDailyMaxOrderCount(event.target.value)}
+                  />
+                  <span>회</span>
+                </div>
+              </label>
+
+              <label>
+                <span>일 손실 한도</span>
+
+                <div className="account-page__limit-input">
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    inputMode="decimal"
+                    placeholder="5"
+                    value={dailyLossLimitRate}
+                    disabled={isTradingLimitSaving}
+                    onChange={(event) => setDailyLossLimitRate(event.target.value)}
+                  />
+                  <span>%</span>
+                </div>
+              </label>
+            </div>
+
+            {tradingLimitError && (
+              <div className="account-page__limit-message account-page__limit-message--error">
+                <AlertCircle size={15} />
+                <span>{tradingLimitError}</span>
+              </div>
+            )}
+
+            <div className="account-page__limit-actions">
+              <span>주문 실행 전 공통 한도를 기준으로 주문 가능 여부를 확인합니다.</span>
+
+              <div>
+                {tradingLimit && (
+                  <button
+                    type="button"
+                    className="account-page__secondary-button"
+                    disabled={isTradingLimitSaving}
+                    onClick={handleTradingLimitCancel}
+                  >
+                    취소
+                  </button>
+                )}
+
+                <button
+                  type="submit"
+                  className="account-page__primary-button"
+                  disabled={isTradingLimitSaving}
+                >
+                  {isTradingLimitSaving ? (
+                    <>
+                      <LoaderCircle className="account-page__spinner" size={15} />
+                      저장 중
+                    </>
+                  ) : tradingLimit ? (
+                    '변경사항 저장'
+                  ) : (
+                    '한도 설정'
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <div className="account-page__limit-summary">
+            <div className="account-page__limit-values">
+              <div>
+                <span>일 최대 주문 금액</span>
+                <strong>{tradingLimit.dailyMaxOrderAmount.toLocaleString('ko-KR')}원</strong>
+              </div>
+
+              <div>
+                <span>일 최대 주문 횟수</span>
+                <strong>{tradingLimit.dailyMaxOrderCount.toLocaleString('ko-KR')}회</strong>
+              </div>
+
+              <div>
+                <span>일 손실 한도</span>
+                <strong>{tradingLimit.dailyLossLimitRate}%</strong>
+              </div>
+            </div>
+
+            <div className="account-page__limit-summary-footer">
+              <span>자동매매 전략의 주문은 이 한도 내에서 실행됩니다.</span>
+
+              <button
+                type="button"
+                className="account-page__secondary-button"
+                onClick={handleTradingLimitEdit}
+              >
+                한도 변경
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!isTradingLimitEditing && tradingLimitError && (
+          <div className="account-page__limit-message account-page__limit-message--error">
+            <AlertCircle size={15} />
+            <span>{tradingLimitError}</span>
+
+            <button
+              type="button"
+              disabled={isTradingLimitLoading}
+              onClick={() => void loadTradingLimit()}
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
+
+        {tradingLimitSuccess && !isTradingLimitEditing && (
+          <div className="account-page__limit-message account-page__limit-message--success">
+            <Check size={15} />
+            <span>{tradingLimitSuccess}</span>
+          </div>
         )}
       </section>
 
