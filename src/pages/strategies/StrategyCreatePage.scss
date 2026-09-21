@@ -114,16 +114,16 @@
     display: flex;
     height: 46px;
     align-items: center;
+    background: $color-white;
     border: 1px solid $color-gray-300;
     border-radius: $radius-sm;
-    background: $color-white;
     transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
+      border-color $duration-fast $ease-out,
+      box-shadow $duration-fast $ease-out;
 
     &:focus-within {
-      border-color: $color-gray-700;
-      box-shadow: 0 0 0 1px $color-gray-700;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 1px $color-primary;
     }
 
     input {
@@ -131,12 +131,12 @@
       min-width: 0;
       height: 100%;
       padding: 0 14px;
-      border: 0;
-      outline: 0;
-      background: transparent;
       color: $color-gray-900;
       font: inherit;
       font-size: 14px;
+      background: transparent;
+      border: 0;
+      outline: 0;
 
       &::placeholder {
         color: $color-gray-400;
@@ -164,11 +164,11 @@
   &__error {
     margin-top: 20px;
     padding: 12px 14px;
-    border-left: 3px solid $color-rise;
-    background: rgb(229 72 77 / 5%);
     color: $color-rise;
     font-size: 13px;
     line-height: 1.5;
+    background: $color-rise-soft;
+    border-left: 3px solid $color-rise;
   }
 
   &__actions {
@@ -178,41 +178,12 @@
     padding: 28px 0 12px;
     border-top: 1px solid $color-gray-200;
 
-    button {
-      height: 44px;
-      padding: 0 20px;
-      border-radius: $radius-sm;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+    > .button {
+      min-width: 104px;
 
-      &:disabled {
-        cursor: default;
-        opacity: 0.55;
+      &:last-child {
+        min-width: 128px;
       }
-    }
-  }
-
-  &__cancel {
-    border: 1px solid $color-gray-300;
-    background: $color-white;
-    color: $color-gray-700;
-
-    &:hover:not(:disabled) {
-      background: $color-gray-50;
-    }
-  }
-
-  &__submit {
-    min-width: 116px;
-    border: 1px solid $color-primary;
-    background: $color-primary;
-    color: $color-white;
-
-    &:hover:not(:disabled) {
-      border-color: $color-primary-hover;
-      background: $color-primary-hover;
     }
   }
 
@@ -225,25 +196,22 @@
       display: block;
       color: $color-gray-900;
       font-size: 18px;
+      font-weight: 650;
     }
 
     p {
       margin: 8px 0 20px;
       font-size: 14px;
+      line-height: 1.5;
     }
 
-    button {
-      height: 42px;
-      padding: 0 18px;
-      border: 0;
-      border-radius: $radius-sm;
-      background: $color-primary;
-      color: $color-white;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+    > .button {
+      margin: 0 auto;
     }
+  }
+
+  &__spinner {
+    animation: strategy-create-spin 0.8s linear infinite;
   }
 
   @include mobile {
@@ -280,13 +248,24 @@
     &__actions {
       gap: 8px;
 
-      button {
+      > .button {
+        min-width: 0;
         flex: 1;
+
+        &:last-child {
+          min-width: 0;
+        }
       }
     }
 
     &__state {
       padding: 72px 0;
     }
+  }
+}
+
+@keyframes strategy-create-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

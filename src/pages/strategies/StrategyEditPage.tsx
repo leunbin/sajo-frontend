@@ -1,10 +1,12 @@
 import axios from 'axios';
+import { ArrowLeft, Save } from 'lucide-react';
 import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { getStrategy, updateStrategy } from '../../api/strategy';
-import { invalidateStrategyValidation } from '../../utils/strategyValidation';
+import Button from '../../components/common/Button/Button';
 import type { StrategyDetail, StrategyUpdateRequest } from '../../types/strategy';
+import { invalidateStrategyValidation } from '../../utils/strategyValidation';
 
 import './StrategyEditPage.scss';
 
@@ -28,7 +30,6 @@ function StrategyEditPage() {
   const { strategyId } = useParams<{ strategyId: string }>();
 
   const [strategy, setStrategy] = useState<StrategyDetail | null>(null);
-
   const [form, setForm] = useState<StrategyForm | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -250,9 +251,14 @@ function StrategyEditPage() {
 
           <p>{pageError || '전략을 찾을 수 없습니다.'}</p>
 
-          <button type="button" onClick={() => navigate('/strategies')}>
+          <Button
+            variant="primary"
+            size="md"
+            leadingIcon={<ArrowLeft size={16} />}
+            onClick={() => navigate('/strategies')}
+          >
             전략 목록으로
-          </button>
+          </Button>
         </div>
       </main>
     );
@@ -266,9 +272,14 @@ function StrategyEditPage() {
 
           <p>전략 상세에서 자동매매를 중지하고 전략을 비활성화한 후 다시 시도해주세요.</p>
 
-          <button type="button" onClick={() => navigate(`/strategies/${strategy.strategyId}`)}>
+          <Button
+            variant="primary"
+            size="md"
+            leadingIcon={<ArrowLeft size={16} />}
+            onClick={() => navigate(`/strategies/${strategy.strategyId}`)}
+          >
             전략 상세로
-          </button>
+          </Button>
         </div>
       </main>
     );
@@ -456,18 +467,26 @@ function StrategyEditPage() {
         )}
 
         <div className="strategy-edit__actions">
-          <button
+          <Button
             type="button"
-            className="strategy-edit__cancel"
+            variant="ghost"
+            size="lg"
             disabled={isSubmitting}
             onClick={() => navigate(`/strategies/${strategy.strategyId}`)}
           >
             취소
-          </button>
+          </Button>
 
-          <button type="submit" className="strategy-edit__submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="strategy-edit__submit"
+            leadingIcon={!isSubmitting ? <Save size={16} /> : undefined}
+            loading={isSubmitting}
+          >
             {isSubmitting ? '저장하고 있습니다...' : '변경사항 저장'}
-          </button>
+          </Button>
         </div>
       </form>
     </main>

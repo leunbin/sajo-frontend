@@ -8,6 +8,7 @@ import {
   Landmark,
   Link2,
   LoaderCircle,
+  Pencil,
   RefreshCw,
   ShieldCheck,
   Unlink,
@@ -24,6 +25,7 @@ import {
   getMyAccount,
 } from '../../api/account';
 import { createTradingLimit, getTradingLimit, updateTradingLimit } from '../../api/autoTrading';
+import Button from '../../components/common/Button/Button';
 
 import type {
   Account,
@@ -582,17 +584,17 @@ const AccountPage = () => {
               있습니다.
             </p>
 
-            <button
-              type="button"
-              className="account-page__primary-button"
+            <Button
+              variant="primary"
+              size="md"
+              leadingIcon={<Link2 />}
               onClick={() => {
                 setFormError('');
                 setShowConnectionForm(true);
               }}
             >
-              <Link2 size={16} />
               계좌 연결
-            </button>
+            </Button>
           </section>
         ) : (
           <section className="account-page__connect">
@@ -748,9 +750,9 @@ const AccountPage = () => {
               {formError && <p className="account-page__form-error">{formError}</p>}
 
               <div className="account-page__form-actions">
-                <button
+                <Button
                   type="button"
-                  className="account-page__secondary-button"
+                  variant="ghost"
                   disabled={isConnecting}
                   onClick={() => {
                     setShowConnectionForm(false);
@@ -758,25 +760,18 @@ const AccountPage = () => {
                   }}
                 >
                   취소
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="submit"
-                  className="account-page__primary-button"
-                  disabled={isConnecting}
+                  variant="primary"
+                  loading={isConnecting}
+                  leadingIcon={
+                    isConnecting ? <LoaderCircle className="account-page__spinner" /> : <Link2 />
+                  }
                 >
-                  {isConnecting ? (
-                    <>
-                      <LoaderCircle className="account-page__spinner" size={16} />
-                      연결 중
-                    </>
-                  ) : (
-                    <>
-                      <Link2 size={16} />
-                      계좌 연결
-                    </>
-                  )}
-                </button>
+                  {isConnecting ? '연결 중' : '계좌 연결'}
+                </Button>
               </div>
             </form>
           </section>
@@ -1081,32 +1076,30 @@ const AccountPage = () => {
 
               <div>
                 {tradingLimit && (
-                  <button
+                  <Button
                     type="button"
-                    className="account-page__secondary-button"
+                    variant="ghost"
                     disabled={isTradingLimitSaving}
                     onClick={handleTradingLimitCancel}
                   >
                     취소
-                  </button>
+                  </Button>
                 )}
 
-                <button
+                <Button
                   type="submit"
-                  className="account-page__primary-button"
-                  disabled={isTradingLimitSaving}
+                  variant="primary"
+                  loading={isTradingLimitSaving}
+                  leadingIcon={
+                    isTradingLimitSaving ? (
+                      <LoaderCircle className="account-page__spinner" />
+                    ) : (
+                      <Check />
+                    )
+                  }
                 >
-                  {isTradingLimitSaving ? (
-                    <>
-                      <LoaderCircle className="account-page__spinner" size={15} />
-                      저장 중
-                    </>
-                  ) : tradingLimit ? (
-                    '변경사항 저장'
-                  ) : (
-                    '한도 설정'
-                  )}
-                </button>
+                  {isTradingLimitSaving ? '저장 중' : tradingLimit ? '변경사항 저장' : '한도 설정'}
+                </Button>
               </div>
             </div>
           </form>
@@ -1132,13 +1125,14 @@ const AccountPage = () => {
             <div className="account-page__limit-summary-footer">
               <span>자동매매 전략의 주문은 이 한도 내에서 실행됩니다.</span>
 
-              <button
+              <Button
                 type="button"
-                className="account-page__secondary-button"
+                variant="secondary"
+                leadingIcon={<Pencil />}
                 onClick={handleTradingLimitEdit}
               >
                 한도 변경
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -1202,19 +1196,17 @@ const AccountPage = () => {
             <p>활성 자동매매 또는 미체결 주문이 있는 경우 계좌를 해제할 수 없습니다.</p>
           </div>
 
-          <button type="button" disabled={isDeleting} onClick={() => void handleDisconnect()}>
-            {isDeleting ? (
-              <>
-                <LoaderCircle className="account-page__spinner" size={15} />
-                해제 중
-              </>
-            ) : (
-              <>
-                <Unlink size={15} />
-                연결 해제
-              </>
-            )}
-          </button>
+          <Button
+            type="button"
+            variant="danger"
+            loading={isDeleting}
+            leadingIcon={
+              isDeleting ? <LoaderCircle className="account-page__spinner" /> : <Unlink />
+            }
+            onClick={() => void handleDisconnect()}
+          >
+            {isDeleting ? '해제 중' : '연결 해제'}
+          </Button>
         </div>
       </section>
     </main>

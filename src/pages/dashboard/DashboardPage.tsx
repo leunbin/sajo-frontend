@@ -16,6 +16,7 @@ import { getAccountDeposit, getMyAccount } from '../../api/account';
 import { getAutoTradings } from '../../api/autoTrading';
 import { getOrders } from '../../api/order';
 import { getStrategies } from '../../api/strategy';
+import Button from '../../components/common/Button/Button';
 
 import type { Account, AccountDeposit } from '../../types/account';
 import type { AutoTrading } from '../../types/autoTrading';
@@ -148,9 +149,7 @@ const DashboardPage = () => {
   const [deposit, setDeposit] = useState<AccountDeposit | null>(null);
 
   const [strategies, setStrategies] = useState<StrategySummary[]>([]);
-
   const [autoTradings, setAutoTradings] = useState<AutoTrading[]>([]);
-
   const [orders, setOrders] = useState<OrderListItem[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -296,9 +295,14 @@ const DashboardPage = () => {
 
           <p>{pageError}</p>
 
-          <button type="button" onClick={() => void handleRefresh()}>
+          <Button
+            variant="secondary"
+            size="sm"
+            leadingIcon={<RefreshCw size={15} />}
+            onClick={() => void handleRefresh()}
+          >
             다시 시도
-          </button>
+          </Button>
         </div>
       </main>
     );
@@ -312,21 +316,22 @@ const DashboardPage = () => {
           <p>내 자산과 자동매매 운영 현황을 한눈에 확인합니다.</p>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="sm"
           className="dashboard-page__refresh"
           aria-label="대시보드 새로고침"
           title="새로고침"
           disabled={isRefreshing}
+          leadingIcon={
+            <RefreshCw size={16} className={isRefreshing ? 'dashboard-page__spinner' : undefined} />
+          }
           onClick={() => void handleRefresh()}
         >
-          <RefreshCw size={16} className={isRefreshing ? 'dashboard-page__spinner' : undefined} />
-
-          <span>새로고침</span>
-        </button>
+          새로고침
+        </Button>
       </header>
 
-      {/* 자산 */}
       <section className="dashboard-page__section">
         <div className="dashboard-page__section-header">
           <div>
@@ -353,7 +358,7 @@ const DashboardPage = () => {
               <p>계좌를 연결하면 자산과 평가 손익을 대시보드에서 확인할 수 있습니다.</p>
             </div>
 
-            <Link to="/account" className="dashboard-page__inline-button">
+            <Link to="/account" className="dashboard-page__cta-link">
               계좌 연결
             </Link>
           </div>
@@ -406,7 +411,6 @@ const DashboardPage = () => {
         )}
       </section>
 
-      {/* 전략 운영 */}
       <section className="dashboard-page__section">
         <div className="dashboard-page__section-header">
           <div>
@@ -442,7 +446,6 @@ const DashboardPage = () => {
         </div>
       </section>
 
-      {/* 활성 전략 */}
       <section className="dashboard-page__section">
         <div className="dashboard-page__section-header">
           <div>
@@ -459,7 +462,9 @@ const DashboardPage = () => {
 
             <p>전략을 만들고 검증한 뒤 활성화하면 이곳에 표시됩니다.</p>
 
-            <Link to="/strategies/new">전략 만들기</Link>
+            <Link to="/strategies/new" className="dashboard-page__empty-cta">
+              전략 만들기
+            </Link>
           </div>
         ) : (
           <div className="dashboard-page__strategy-list">
@@ -512,7 +517,6 @@ const DashboardPage = () => {
         )}
       </section>
 
-      {/* 최근 주문 */}
       <section className="dashboard-page__section">
         <div className="dashboard-page__section-header">
           <div>
