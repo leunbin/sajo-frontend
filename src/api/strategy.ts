@@ -7,6 +7,8 @@ import type {
   StrategyStatus,
   StrategyListResponse,
   StrategyActivationResponse,
+  StrategyUpdateRequest,
+  StrategyUpdateResponse,
 } from '../types/strategy';
 
 export const createStrategy = async (
@@ -56,4 +58,20 @@ export const updateStrategyActivation = async (
   );
 
   return response.data.data;
+};
+
+export const updateStrategy = async (
+  strategyId: string,
+  request: StrategyUpdateRequest
+): Promise<StrategyUpdateResponse> => {
+  const response = await apiClient.patch<ApiResponse<StrategyUpdateResponse>>(
+    `/api/v1/strategies/${strategyId}`,
+    request
+  );
+
+  return response.data.data;
+};
+
+export const deleteStrategy = async (strategyId: string): Promise<void> => {
+  await apiClient.delete(`/api/v1/strategies/${strategyId}`);
 };

@@ -1,0 +1,306 @@
+@use '../../styles/abstracts/variables' as *;
+@use '../../styles/abstracts/mixins' as *;
+
+.strategy-edit {
+  width: 100%;
+
+  &__header {
+    margin-top: 32px;
+
+    > span {
+      color: $color-primary;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 8px 0 0;
+      color: $color-gray-900;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+    }
+
+    p {
+      margin: 7px 0 0;
+      color: $color-gray-500;
+      font-size: 14px;
+    }
+  }
+
+  &__form {
+    margin-top: 40px;
+  }
+
+  &__section {
+    padding: 30px 0;
+    border-top: 1px solid $color-gray-200;
+
+    &:first-child {
+      border-top-color: $color-gray-300;
+    }
+  }
+
+  &__section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0;
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 6px 0 0;
+      color: $color-gray-500;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    > span {
+      flex-shrink: 0;
+      color: $color-gray-400;
+      font-size: 12px;
+    }
+  }
+
+  &__single-field {
+    max-width: 560px;
+  }
+
+  &__field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+
+    &--three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  &__field-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: $color-gray-700;
+    font-size: 13px;
+    font-weight: 500;
+
+    em {
+      color: $color-rise;
+      font-style: normal;
+    }
+
+    small {
+      color: $color-gray-400;
+      font-size: 11px;
+      font-weight: 400;
+    }
+  }
+
+  &__input-wrap {
+    display: flex;
+    height: 46px;
+    align-items: center;
+    border: 1px solid $color-gray-300;
+    border-radius: $radius-sm;
+    background: $color-white;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:focus-within {
+      border-color: $color-gray-700;
+      box-shadow: 0 0 0 1px $color-gray-700;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      height: 100%;
+      padding: 0 14px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: $color-gray-900;
+      font: inherit;
+      font-size: 14px;
+
+      &::placeholder {
+        color: $color-gray-400;
+      }
+
+      &[type='number'] {
+        appearance: textfield;
+      }
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        margin: 0;
+        appearance: none;
+      }
+    }
+
+    > span {
+      flex-shrink: 0;
+      padding-right: 14px;
+      color: $color-gray-500;
+      font-size: 13px;
+    }
+  }
+
+  &__field-notice {
+    margin: 14px 0 0;
+    color: $color-gray-400;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  &__error {
+    margin-top: 20px;
+    padding: 12px 14px;
+    border-left: 3px solid $color-rise;
+    background: rgb(229 72 77 / 5%);
+    color: $color-rise;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 28px 0 12px;
+    border-top: 1px solid $color-gray-200;
+
+    button {
+      height: 44px;
+      padding: 0 20px;
+      border-radius: $radius-sm;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: default;
+        opacity: 0.55;
+      }
+    }
+  }
+
+  &__cancel {
+    border: 1px solid $color-gray-300;
+    background: $color-white;
+    color: $color-gray-700;
+
+    &:hover:not(:disabled) {
+      background: $color-gray-50;
+    }
+  }
+
+  &__submit {
+    min-width: 126px;
+    border: 1px solid $color-primary;
+    background: $color-primary;
+    color: $color-white;
+
+    &:hover:not(:disabled) {
+      border-color: $color-primary-hover;
+      background: $color-primary-hover;
+    }
+  }
+
+  &__state {
+    padding: 100px 0;
+    color: $color-gray-500;
+    text-align: center;
+
+    strong {
+      display: block;
+      color: $color-gray-900;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    p {
+      max-width: 430px;
+      margin: 8px auto 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    button {
+      height: 42px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: $radius-sm;
+      background: $color-primary;
+      color: $color-white;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: $color-primary-hover;
+      }
+    }
+  }
+
+  @include mobile {
+    &__header {
+      margin-top: 24px;
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+
+    &__form {
+      margin-top: 32px;
+    }
+
+    &__section {
+      padding: 26px 0;
+    }
+
+    &__section-heading {
+      margin-bottom: 20px;
+    }
+
+    &__single-field {
+      max-width: none;
+    }
+
+    &__field-grid,
+    &__field-grid--three {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    &__actions {
+      gap: 8px;
+
+      button {
+        flex: 1;
+      }
+    }
+
+    &__state {
+      padding: 72px 0;
+    }
+  }
+}
