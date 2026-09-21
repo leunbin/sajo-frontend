@@ -1,11 +1,13 @@
 import axios from 'axios';
-import { ChevronRight, Plus } from 'lucide-react';
+import { ChevronRight, Plus, RotateCcw, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SlidingTabs from '../../components/common/SlidingTabs/SlidingTabs';
 
 import { getStrategies } from '../../api/strategy';
+import Button from '../../components/common/Button/Button';
+import SlidingTabs from '../../components/common/SlidingTabs/SlidingTabs';
 import type { StrategyStatus, StrategySummary } from '../../types/strategy';
+
 import './StrategiesPage.scss';
 
 type StrategyFilter = 'ALL' | 'ACTIVE' | 'INACTIVE';
@@ -34,18 +36,12 @@ function StrategiesPage() {
   const navigate = useNavigate();
 
   const [strategies, setStrategies] = useState<StrategySummary[]>([]);
-
   const [filter, setFilter] = useState<StrategyFilter>('ALL');
-
   const [page, setPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState('');
-
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -115,7 +111,6 @@ function StrategiesPage() {
       const response = await getStrategies(page + 1, PAGE_SIZE, status);
 
       setStrategies((previous) => [...previous, ...response.strategies]);
-
       setPage(response.page);
       setTotalElements(response.totalElements);
     } catch (error) {
@@ -140,17 +135,18 @@ function StrategiesPage() {
       <header className="strategies-page__header">
         <div>
           <h1>내 전략</h1>
-
           <p>투자 전략을 확인하고 운용 상태를 관리할 수 있습니다.</p>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="md"
           className="strategies-page__create"
+          leadingIcon={<Plus size={17} />}
           onClick={() => navigate('/stocks')}
         >
-          <Plus size={17} />새 전략 만들기
-        </button>
+          만들기
+        </Button>
       </header>
 
       <div className="strategies-page__toolbar">
@@ -178,9 +174,15 @@ function StrategiesPage() {
 
           <p>{errorMessage}</p>
 
-          <button type="button" onClick={handleRetry}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="md"
+            leadingIcon={<RotateCcw size={16} />}
+            onClick={handleRetry}
+          >
             다시 시도
-          </button>
+          </Button>
         </div>
       ) : strategies.length === 0 ? (
         <EmptyStrategies filter={filter} onCreate={() => navigate('/stocks')} />
@@ -198,9 +200,15 @@ function StrategiesPage() {
 
           {hasMore && (
             <div className="strategies-page__more">
-              <button type="button" onClick={() => void handleLoadMore()} disabled={isLoadingMore}>
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                loading={isLoadingMore}
+                onClick={() => void handleLoadMore()}
+              >
                 {isLoadingMore ? '불러오는 중...' : '전략 더 보기'}
-              </button>
+              </Button>
             </div>
           )}
         </>
@@ -272,9 +280,15 @@ function EmptyStrategies({ filter, onCreate }: EmptyStrategiesProps) {
 
       <p>종목을 선택하고 첫 투자 전략을 만들어보세요.</p>
 
-      <button type="button" onClick={onCreate}>
+      <Button
+        type="button"
+        variant="primary"
+        size="md"
+        leadingIcon={<Search size={16} />}
+        onClick={onCreate}
+      >
         종목 탐색하기
-      </button>
+      </Button>
     </div>
   );
 }
