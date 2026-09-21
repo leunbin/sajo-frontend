@@ -92,12 +92,12 @@
   }
 
   &__notice {
-    max-width: 310px;
     margin: 0;
     color: $color-gray-400;
     font-size: 11px;
     line-height: 1.5;
     text-align: right;
+    white-space: nowrap;
   }
 
   &__overlay {
@@ -224,6 +224,7 @@
     &__notice {
       max-width: none;
       text-align: left;
+      white-space: normal;
     }
 
     &__modal {
