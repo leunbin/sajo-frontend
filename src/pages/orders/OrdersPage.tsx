@@ -1,6 +1,14 @@
 import axios from 'axios';
-import { AlertCircle, ChevronLeft, ChevronRight, LoaderCircle, RefreshCw, X } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import {
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  LoaderCircle,
+  RefreshCw,
+  X,
+  ChevronDown,
+} from 'lucide-react';
+import { useEffect, useState, useRef, type ReactNode } from 'react';
 
 import { getExecutionDetail, getExecutions } from '../../api/execution';
 import { getOrderDetail, getOrders } from '../../api/order';
@@ -284,43 +292,37 @@ function OrdersPage() {
           </Button>
         </header>
 
-        <div className="orders-page__view-tabs">
-          <SlidingTabs<ViewTab>
-            items={[
-              { value: 'ORDERS', label: '주문' },
-              { value: 'EXECUTIONS', label: '체결' },
-            ]}
-            value={activeTab}
-            onChange={handleTabChange}
-            variant="pill"
-            size="lg"
-            ariaLabel="주문 및 체결"
-          />
-        </div>
-
         <section className="orders-page__toolbar">
-          {activeTab === 'ORDERS' ? (
-            <div className="orders-page__filters">
-              <SlidingTabs<OrderTypeFilter>
-                items={[
-                  { value: 'ALL', label: '전체' },
-                  { value: 'BUY', label: '매수' },
-                  { value: 'SELL', label: '매도' },
-                ]}
-                value={orderType}
-                onChange={handleFilterChange}
-                variant="underline"
-                size="sm"
-                ariaLabel="주문 유형"
-              />
-            </div>
-          ) : (
-            <span className="orders-page__toolbar-title">체결 내역</span>
-          )}
+          <div className="orders-page__toolbar-left">
+            {activeTab === 'ORDERS' ? (
+              <div className="orders-page__filters">
+                <SlidingTabs<OrderTypeFilter>
+                  items={[
+                    { value: 'ALL', label: '전체' },
+                    { value: 'BUY', label: '매수' },
+                    { value: 'SELL', label: '매도' },
+                  ]}
+                  value={orderType}
+                  onChange={handleFilterChange}
+                  variant="underline"
+                  size="sm"
+                  ariaLabel="주문 유형"
+                />
+              </div>
+            ) : (
+              <span className="orders-page__toolbar-title">체결 내역</span>
+            )}
+          </div>
 
-          {!isLoading && !error && (
-            <span className="orders-page__count">총 {totalElements.toLocaleString('ko-KR')}건</span>
-          )}
+          <div className="orders-page__toolbar-right">
+            {!isLoading && !error && (
+              <span className="orders-page__count">
+                총 {totalElements.toLocaleString('ko-KR')}건
+              </span>
+            )}
+
+            <HistoryTypeDropdown value={activeTab} onChange={handleTabChange} />
+          </div>
         </section>
 
         {isLoading ? (
@@ -1051,6 +1053,99 @@ function formatFullDateTime(value: string): string {
     second: '2-digit',
     hour12: false,
   }).format(date);
+}
+
+function HistoryTypeDropdown({
+  value,
+  onChange,
+}: {
+  value: ViewTab;
+  onChange: (value: ViewTab) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  const handleSelect = (nextValue: ViewTab) => {
+    onChange(nextValue);
+    setIsOpen(false);
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={`orders-page__history-select ${isOpen ? 'orders-page__history-select--open' : ''}`}
+    >
+      <button
+        type="button"
+        className="orders-page__history-select-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((previous) => !previous)}
+      >
+        <span>{value === 'ORDERS' ? '주문 내역' : '체결 내역'}</span>
+
+        <ChevronDown size={15} className="orders-page__history-select-chevron" />
+      </button>
+
+      {isOpen && (
+        <div className="orders-page__history-select-menu" role="listbox" aria-label="내역 종류">
+          <button
+            type="button"
+            role="option"
+            aria-selected={value === 'ORDERS'}
+            className={
+              value === 'ORDERS'
+                ? 'orders-page__history-select-option orders-page__history-select-option--active'
+                : 'orders-page__history-select-option'
+            }
+            onClick={() => handleSelect('ORDERS')}
+          >
+            주문 내역
+          </button>
+
+          <button
+            type="button"
+            role="option"
+            aria-selected={value === 'EXECUTIONS'}
+            className={
+              value === 'EXECUTIONS'
+                ? 'orders-page__history-select-option orders-page__history-select-option--active'
+                : 'orders-page__history-select-option'
+            }
+            onClick={() => handleSelect('EXECUTIONS')}
+          >
+            체결 내역
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function getErrorMessage(error: unknown, fallback: string): string {

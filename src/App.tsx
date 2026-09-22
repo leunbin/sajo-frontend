@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-// import ProtectedRoute from './pages/auth/ProtectedRoute';
+import ProtectedRoute from './pages/auth/ProtectedRoute';
 import AdminRoute from './pages/auth/AdminRoute';
 
 import AppLayout from './components/layout/AppLayout';
@@ -39,38 +39,38 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
 
         {/* 일반 사용자 영역 */}
-        {/* <Route element={<ProtectedRoute />}> */}
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<DashboardPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<DashboardPage />} />
 
-          <Route path="/stocks" element={<StocksPage />} />
+            <Route path="/stocks" element={<StocksPage />} />
 
-          <Route path="/stocks/:stockCode" element={<StockDetailPage />} />
+            <Route path="/stocks/:stockCode" element={<StockDetailPage />} />
 
-          <Route path="/strategies" element={<StrategiesPage />} />
+            <Route path="/strategies" element={<StrategiesPage />} />
 
-          <Route path="/strategies/new" element={<StrategyCreatePage />} />
+            <Route path="/strategies/new" element={<StrategyCreatePage />} />
 
-          <Route path="/strategies/:strategyId" element={<StrategyDetailPage />} />
+            <Route path="/strategies/:strategyId" element={<StrategyDetailPage />} />
 
-          <Route path="/strategies/:strategyId/edit" element={<StrategyEditPage />} />
+            <Route path="/strategies/:strategyId/edit" element={<StrategyEditPage />} />
 
-          <Route path="/strategies/:strategyId/backtest" element={<BacktestPage />} />
+            <Route path="/strategies/:strategyId/backtest" element={<BacktestPage />} />
 
-          <Route
-            path="/strategies/:strategyId/backtests/:backtestId/analysis"
-            element={<AiRiskAnalysisPage />}
-          />
+            <Route
+              path="/strategies/:strategyId/backtests/:backtestId/analysis"
+              element={<AiRiskAnalysisPage />}
+            />
 
-          <Route path="/analysis-history" element={<AnalysisHistoryPage />} />
+            <Route path="/analysis-history" element={<AnalysisHistoryPage />} />
 
-          <Route path="/analysis-history/ai/:analysisId" element={<AiRiskAnalysisDetailPage />} />
+            <Route path="/analysis-history/ai/:analysisId" element={<AiRiskAnalysisDetailPage />} />
 
-          <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
 
-          <Route path="/account" element={<AccountPage />} />
+            <Route path="/account" element={<AccountPage />} />
+          </Route>
         </Route>
-        {/* </Route> */}
 
         {/* 관리자 영역 */}
         <Route element={<AdminRoute />}>
